@@ -1,5 +1,16 @@
 # HilbertSpace
 
+## Coding convensions
+- Naming convensions <br>
+
+| | First letter | Word concatenation |
+| :--- | :---: | ---: |
+| Variable   | Lowercase | Camel case |
+| Type alias | Uppercase | Camel case |
+| Class      | Uppercase | Camel case |
+| Method     | Lowercase | Snake case |
+| Function   | Lowercase | Snake case |
+
 ## Coding conventions for mathematical objects
 
 - Correspondence between Fock states and array objects <br>

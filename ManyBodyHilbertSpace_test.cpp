@@ -19,16 +19,35 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 	REQUIRE(mbSpace.locSpace() == locSpace);
 	REQUIRE(mbSpace.dimLoc() == locSpace.dim());
 
-	// test locState
-	// test ordinalToConfig
-	// test configToOrdinal
+// test locState
+// test ordinal_to_config
+// test config_to_ordinal
+#pragma omp parallel for
 	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum) {
-		auto config = mbSpace.ordinalToConfig(stateNum);
-		REQUIRE(stateNum == mbSpace.configToOrdinal(config));
+		auto config = mbSpace.ordinal_to_config(stateNum);
+		REQUIRE(stateNum == mbSpace.config_to_ordinal(config));
 		for(size_t pos = 0; pos != mbSpace.sysSize(); ++pos) {
 			REQUIRE(config(pos) == mbSpace.locState(stateNum, pos));
 		}
 	}
+
+	// test for translation operations
+	mbSpace.compute_transEqClass();
+	REQUIRE(mbSpace.transPeriod().sum() == static_cast<int>(mbSpace.dim()));
+
+	Eigen::ArrayXi appeared = Eigen::ArrayXi::Zero(mbSpace.dim());
+#pragma omp parallel for
+	for(size_t eqClassNum = 0; eqClassNum != mbSpace.transEqDim(); ++eqClassNum) {
+		auto stateNum = mbSpace.transEqClassRep(eqClassNum);
+		appeared(stateNum) += 1;
+		for(auto trans = 1; trans != mbSpace.transPeriod(eqClassNum); ++trans) {
+			auto translated = mbSpace.translate(stateNum, trans);
+			appeared(translated) += 1;
+		}
+	}
+#pragma omp parallel for
+	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum)
+		REQUIRE(appeared(stateNum) == 1);
 }
 
 TEST_CASE("ManyBodyHilbertSpace", "test") {
