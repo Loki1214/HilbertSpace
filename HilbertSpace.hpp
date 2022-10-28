@@ -11,7 +11,7 @@ class HilbertSpace;
 template<>
 class HilbertSpace<int> {
 	private:
-		int m_dim;
+		size_t m_dim;
 
 	public:
 		/**
@@ -19,7 +19,7 @@ class HilbertSpace<int> {
 		 *
 		 * @param dim Dimension of the Hilbert space
 		 */
-		__host__ __device__ HilbertSpace(int dim = 0) : m_dim{dim} {}
+		__host__ __device__ HilbertSpace(size_t dim = 0) : m_dim{dim} {}
 
 		__host__ __device__               HilbertSpace(HilbertSpace const& other) = default;
 		__host__ __device__ HilbertSpace& operator=(HilbertSpace const& other)    = default;
@@ -34,13 +34,13 @@ class HilbertSpace<int> {
 		}
 		/* @} */
 
-		__host__ __device__ int dim() const { return m_dim; };
+		__host__ __device__ size_t dim() const { return m_dim; };
 };
 
 template<class Derived>
 class HilbertSpace {
 	public:
-		__host__ __device__ int dim() const {
+		__host__ __device__ size_t dim() const {
 			return static_cast<Derived const*>(this)->dim_impl();
 		};
 

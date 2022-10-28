@@ -10,6 +10,7 @@ FetchContent_Declare(catch2
 FetchContent_MakeAvailable(Catch2)
 enable_testing()
 
+include_directories(SYSTEM eigen)
 set(modules
 	HilbertSpace
 	ManyBodyHilbertSpace
@@ -20,4 +21,4 @@ foreach(name IN LISTS modules)
 	target_compile_options(${name}_test PRIVATE -Wall -Wextra)
 	target_link_libraries(${name}_test Catch2::Catch2WithMain)
 	add_test(${name}_test ${name}_test)
-endforeach()
+endforeach(name)

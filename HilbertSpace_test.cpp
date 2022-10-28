@@ -17,7 +17,7 @@ TEST_CASE("HilbertSpace", "test") {
 			REQUIRE(hSpace.dim() == 0);
 		}
 		for(size_t n = 0; n != testLoop; ++n) {
-			auto              dim = dist(engine);
+			size_t            dim = dist(engine);
 			HilbertSpace<int> hSpace(dim);
 			REQUIRE(hSpace.dim() == dim);
 		}
@@ -25,7 +25,7 @@ TEST_CASE("HilbertSpace", "test") {
 	{
 		// Copy constructor
 		for(size_t n = 0; n != testLoop; ++n) {
-			auto              dim = dist(engine);
+			size_t            dim = dist(engine);
 			HilbertSpace<int> hSpace1(dim);
 			HilbertSpace<int> hSpace2(hSpace1);
 			REQUIRE(hSpace1.dim() == hSpace2.dim());
@@ -34,9 +34,9 @@ TEST_CASE("HilbertSpace", "test") {
 	{
 		// Move constructor
 		for(size_t n = 0; n != testLoop; ++n) {
-			auto              dim = dist(engine);
+			size_t            dim = dist(engine);
 			HilbertSpace<int> hSpace1(dim);
-			HilbertSpace<int> hSpace2( std::move(hSpace1) );
+			HilbertSpace<int> hSpace2(std::move(hSpace1));
 			REQUIRE(hSpace2.dim() == dim);
 		}
 	}
@@ -54,7 +54,7 @@ TEST_CASE("HilbertSpace", "test") {
 	{
 		// Move assignment operator
 		for(size_t n = 0; n != testLoop; ++n) {
-			auto              dim = dist(engine);
+			size_t            dim = dist(engine);
 			HilbertSpace<int> hSpace1(dim);
 			HilbertSpace<int> hSpace2;
 			hSpace2 = std::move(hSpace1);
@@ -65,7 +65,7 @@ TEST_CASE("HilbertSpace", "test") {
 	{
 		// Equality operator
 		for(size_t n = 0; n != testLoop; ++n) {
-			auto              dim = dist(engine);
+			size_t            dim = dist(engine);
 			HilbertSpace<int> hSpace1(dim);
 			HilbertSpace<int> hSpace2(hSpace1);
 			REQUIRE(hSpace1.dim() == hSpace2.dim());
