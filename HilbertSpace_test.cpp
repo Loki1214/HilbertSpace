@@ -1,3 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
+#include "HilbertSpace.hpp"
 
-TEST_CASE("HilbertSpace", "test") { REQUIRE(2 * 2 == 4); }
+TEST_CASE("HilbertSpace", "test") {
+	HilbertSpace<int> hSpace;
+	REQUIRE(hSpace.dim() == 0);
+}
