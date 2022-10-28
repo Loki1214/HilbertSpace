@@ -6,6 +6,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: cmake
         run: mkdir build && cd build && cmake ..
       - name: make
