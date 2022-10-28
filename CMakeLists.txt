@@ -10,7 +10,13 @@ FetchContent_Declare(catch2
 FetchContent_MakeAvailable(Catch2)
 enable_testing()
 
-add_executable(HilbertSpace_test HilbertSpace_test.cpp)
-target_compile_options(HilbertSpace_test PRIVATE -Wall -Wextra)
-target_link_libraries(HilbertSpace_test Catch2::Catch2WithMain)
-add_test(HilbertSpace_test HilbertSpace_test)
+set(modules
+	HilbertSpace
+)
+
+foreach(name IN LISTS modules)
+	add_executable(${name}_test ${name}_test.cpp)
+	target_compile_options(${name}_test PRIVATE -Wall -Wextra)
+	target_link_libraries(${name}_test Catch2::Catch2WithMain)
+	add_test(${name}_test ${name}_test)
+endforeach()
