@@ -12,6 +12,7 @@ enable_testing()
 
 set(modules
 	HilbertSpace
+	ManyBodyHilbertSpace
 )
 
 foreach(name IN LISTS modules)
