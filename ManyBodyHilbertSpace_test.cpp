@@ -48,6 +48,24 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 #pragma omp parallel for
 	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum)
 		REQUIRE(appeared(stateNum) == 1);
+
+		// test for state_to_transEqClass
+		// test for state_to_transShift
+#pragma omp parallel for
+	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum) {
+		auto const eqClass    = mbSpace.state_to_transEqClass(stateNum);
+		auto const eqClassRep = mbSpace.transEqClassRep(eqClass);
+		auto const trans      = mbSpace.state_to_transShift(stateNum);
+		REQUIRE(static_cast<int>(stateNum) == mbSpace.translate(eqClassRep, trans));
+	}
+
+	// test for reverse()
+#pragma omp parallel for
+	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum) {
+		auto config   = mbSpace.ordinal_to_config(stateNum);
+		auto reversed = mbSpace.config_to_ordinal(config.reverse());
+		REQUIRE(static_cast<int>(reversed) == mbSpace.reverse(stateNum));
+	}
 }
 
 TEST_CASE("ManyBodyHilbertSpace", "test") {

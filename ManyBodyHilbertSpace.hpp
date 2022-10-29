@@ -59,6 +59,7 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		mutable Eigen::ArrayXi m_transEqClassRep;
 		mutable Eigen::ArrayXi m_transPeriod;
 		mutable Eigen::ArrayXi m_stateToTransEqClass;
+		mutable Eigen::ArrayXi m_stateToTransShift;
 
 	public:
 		__host__ void compute_transEqClass() const;
@@ -69,20 +70,23 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 			return m_transEqClassRep;
 		}
 		__host__ __device__ int transEqClassRep(int eqClassNum) const {
-			return m_transEqClassRep[eqClassNum];
+			return m_transEqClassRep(eqClassNum);
 		}
 
 		__host__ __device__ Eigen::ArrayXi const& transPeriod() const { return m_transPeriod; }
 		__host__ __device__ int                   transPeriod(int eqClassNum) const {
-			                  return m_transPeriod[eqClassNum];
+			                  return m_transPeriod(eqClassNum);
 		}
 
 		__host__ __device__ int state_to_transEqClass(int stateNum) const {
-			return m_stateToTransEqClass[stateNum];
+			return m_stateToTransEqClass(stateNum);
 		}
 		__host__ __device__ int state_to_transPeriod(int stateNum) const {
 			auto eqClass = this->state_to_transEqClass(stateNum);
 			return this->transPeriod(eqClass);
+		}
+		__host__ __device__ int state_to_transShift(int stateNum) const {
+			return m_stateToTransShift(stateNum);
 		}
 
 		// Statically polymorphic functions
@@ -92,6 +96,16 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		template<class Array>
 		__host__ __device__ int translate(int stateNum, int trans, Array& work) const {
 			return static_cast<Derived const*>(this)->translate_impl(stateNum, trans, work);
+		}
+		/* @} */
+
+		/*! @name Parity operation */
+		/* @{ */
+
+	public:
+		// Statically polymorphic functions
+		__host__ __device__ int reverse(int stateNum) const {
+			return static_cast<Derived const*>(this)->reverse_impl(stateNum);
 		}
 		/* @} */
 };
@@ -119,18 +133,21 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 	m_transEqClassRep.resize(eqClassNum);
 	m_transPeriod.resize(eqClassNum);
 	m_stateToTransEqClass.resize(this->dim());
+	m_stateToTransShift.resize(this->dim());
 	calculated = Eigen::ArrayX<bool>::Zero(this->dim());
 	eqClassNum = 0;
 	for(size_t stateNum = 0; stateNum < this->dim(); ++stateNum) {
 		if(calculated(stateNum)) continue;
 		calculated(stateNum)            = true;
 		m_stateToTransEqClass(stateNum) = eqClassNum;
+		m_stateToTransShift(stateNum)   = 0;
 
 		for(period = 1; period < this->sysSize(); ++period) {
 			translated = this->translate(stateNum, period);
 			if(translated == static_cast<int>(stateNum)) break;
 			calculated(translated)            = true;
 			m_stateToTransEqClass(translated) = eqClassNum;
+			m_stateToTransShift(translated)   = period;
 		}
 		m_transEqClassRep(eqClassNum) = stateNum;
 		m_transPeriod(eqClassNum)     = period;
@@ -216,6 +233,16 @@ class ManyBodySpinSpace : public ManyBodySpaceBase<ManyBodySpinSpace> {
 			for(auto l = 0; l != trans; ++l) base *= this->dimLoc();
 			size_t const baseCompl = this->dim() / base;
 			return stateNum / baseCompl + (stateNum % baseCompl) * base;
+		}
+
+		__host__ __device__ int reverse_impl(int stateNum) const {
+			assert(0 <= stateNum && stateNum < static_cast<int>(this->dim()));
+			int    res  = 0;
+			size_t base = 1;
+			for(size_t l = 0; l != this->sysSize(); ++l, base *= this->dimLoc()) {
+				res += (this->dim() / base / this->dimLoc()) * ((stateNum / base) % this->dimLoc());
+			}
+			return res;
 		}
 		/* @} */
 };
