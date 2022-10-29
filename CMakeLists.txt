@@ -23,7 +23,6 @@ set(modules
 	HilbertSpace
 )
 add_subdirectory(Algorithm)
-add_subdirectory(ManyBodyHilbertSpace)
 
 foreach(name IN LISTS modules)
 	add_executable(${name}_test ${name}_test.cpp)
