@@ -18,12 +18,10 @@ if(OpenMP_FOUND)
 endif()
 
 
-include_directories(SYSTEM eigen)
+include_directories(SYSTEM ../eigen)
 set(modules
-	HilbertSpace
-	ManyBodySpaceBase
+	IntegerComposition
 )
-add_subdirectory(Algorithm)
 
 foreach(name IN LISTS modules)
 	add_executable(${name}_test ${name}_test.cpp)

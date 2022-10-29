@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
-#include "ManyBodyHilbertSpace.hpp"
+#include "ManyBodySpaceBase.hpp"
+#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
 #include <random>
 #include <iostream>
 
