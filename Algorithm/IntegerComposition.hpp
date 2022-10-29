@@ -78,6 +78,8 @@ class IntegerComposition {
 			this->ordinal_to_config(res, ordinal);
 			return res;
 		}
+
+		__host__ __device__ int locNumber(size_t ordinal, int const pos) const;
 };
 
 inline IntegerComposition::IntegerComposition(size_t N, size_t Length, size_t Max)
@@ -157,4 +159,20 @@ __host__ __device__ inline void IntegerComposition::ordinal_to_config(Array&    
 		ordinal_copy -= m_workB(z, l);
 	}
 	config[0] = m_N - z;
+}
+
+__host__ __device__ inline int IntegerComposition::locNumber(size_t ordinal, int const pos) const {
+	assert(0 <= pos && pos < static_cast<int>(this->length()));
+	size_t z = 0, zPrev = 0;
+	for(size_t l = 1; l != m_Length - pos; ++l) {
+		while(m_workA(z, l) <= ordinal) z += 1;
+		zPrev = z;
+		ordinal -= m_workB(z, l);
+	}
+	if(pos == 0)
+		return m_N - z;
+	else {
+		while(m_workA(z, m_Length - pos) <= ordinal) z += 1;
+		return z - zPrev;
+	}
 }
