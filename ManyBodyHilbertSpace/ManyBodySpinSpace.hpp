@@ -28,7 +28,7 @@ class ManyBodySpinSpace : public ManyBodySpaceBase<ManyBodySpinSpace> {
 		 * @param locSpace
 		 */
 		__host__ __device__ ManyBodySpinSpace(size_t sysSize = 0, size_t dimLoc = 0)
-		    : Base(sysSize, LocalSpace(dimLoc)) {}
+		    : ManyBodySpinSpace(sysSize, LocalSpace(dimLoc)) {}
 
 	private:
 		/*! @name Implementation for functions of ancestor class HilbertSpace */

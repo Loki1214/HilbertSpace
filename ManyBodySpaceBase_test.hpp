@@ -1,24 +1,16 @@
+#pragma once
 #include <catch2/catch_test_macros.hpp>
 #include "ManyBodySpaceBase.hpp"
-#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
 #include <random>
 #include <iostream>
 
 template<class Derived, class LocalSpace>
 void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sysSize,
                             LocalSpace const& locSpace) {
-	auto powi = [](size_t base, size_t n) {
-		size_t res = 1;
-		for(size_t j = 0; j != n; ++j) res *= base;
-		return res;
-	};
-	if(sysSize == 0)
-		REQUIRE(mbSpace.dim() == 0);
-	else
-		REQUIRE(mbSpace.dim() == powi(locSpace.dim(), sysSize));
+	if(sysSize == 0) REQUIRE(mbSpace.dim() == 0);
 	REQUIRE(mbSpace.sysSize() == sysSize);
-	REQUIRE(mbSpace.locSpace() == locSpace);
 	REQUIRE(mbSpace.dimLoc() == locSpace.dim());
+	REQUIRE(mbSpace.locSpace() == locSpace);
 
 // test locState
 // test ordinal_to_config
@@ -34,6 +26,8 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 
 	// test for translation operations
 	mbSpace.compute_transEqClass();
+	if(mbSpace.dim() > mbSpace.sysSize() && mbSpace.sysSize() > 1)
+		REQUIRE(mbSpace.transEqDim() < mbSpace.dim());
 	REQUIRE(mbSpace.transPeriod().sum() == static_cast<int>(mbSpace.dim()));
 
 	Eigen::ArrayXi appeared = Eigen::ArrayXi::Zero(mbSpace.dim());
@@ -66,26 +60,5 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 		auto config   = mbSpace.ordinal_to_config(stateNum);
 		auto reversed = mbSpace.config_to_ordinal(config.reverse());
 		REQUIRE(static_cast<int>(reversed) == mbSpace.reverse(stateNum));
-	}
-}
-
-TEST_CASE("ManyBodyHilbertSpace", "test") {
-	size_t            dLoc = 2;
-	HilbertSpace<int> locSpace(dLoc);
-
-	// test for class ManyBodySpinSpace
-	{
-		// Default constructor
-		ManyBodySpinSpace mbSpace;
-		test_ManyBodySpaceBase(mbSpace, 0, HilbertSpace<int>());
-	}
-	{
-		// test Constructor1
-		ManyBodySpinSpace mbSpace(0, locSpace);
-		test_ManyBodySpaceBase(mbSpace, 0, locSpace);
-		for(size_t sysSize = 1; sysSize <= 20; ++sysSize) {
-			ManyBodySpinSpace mbSpace(sysSize, locSpace);
-			test_ManyBodySpaceBase(mbSpace, sysSize, locSpace);
-		}
 	}
 }

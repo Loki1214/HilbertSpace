@@ -9,7 +9,7 @@ void test_IntegerComposition(IntegerComposition& iComp, size_t N, size_t L, size
 	REQUIRE(iComp.length() == L);
 	REQUIRE(iComp.max() == Max);
 	REQUIRE(iComp.dim() == dim);
-#pragma omp parallel for
+	// #pragma omp parallel for
 	for(size_t ordinal = 0; ordinal < iComp.dim(); ++ordinal) {
 		auto config = iComp.ordinal_to_config(ordinal);
 		REQUIRE(iComp.value() == static_cast<size_t>(config.sum()));
@@ -22,8 +22,8 @@ void test_IntegerComposition(IntegerComposition& iComp, size_t N, size_t L, size
 }
 
 TEST_CASE("IntegerComposition", "test") {
-	int                    NMax  = 6;
-	int                    LMax  = 20;
+	int                    NMax  = 4;
+	int                    LMax  = 4;
 	Eigen::ArrayXX<size_t> binom = Eigen::ArrayXX<size_t>::Zero(NMax + LMax + 1, NMax + LMax + 1);
 	binom(0, 0)                  = 1;
 	for(auto j = 1; j < binom.rows(); ++j) {
