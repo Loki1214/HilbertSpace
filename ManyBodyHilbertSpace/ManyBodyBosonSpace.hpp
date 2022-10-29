@@ -95,7 +95,7 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		__host__ __device__ int reverse_impl(int stateNum) const {
 			assert(0 <= stateNum && stateNum < static_cast<int>(this->dim()));
 			auto config = m_iComp.ordinal_to_config(stateNum);
-			for(int l = 0; l != this->sysSize() / 2; ++l) {
+			for(size_t l = 0; l != this->sysSize() / 2; ++l) {
 				auto temp                       = config(l);
 				config(l)                       = config(this->sysSize() - 1 - l);
 				config(this->sysSize() - 1 - l) = temp;

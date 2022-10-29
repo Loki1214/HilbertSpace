@@ -22,6 +22,7 @@ include_directories(SYSTEM ../eigen)
 set(modules
 	ManyBodySpinSpace
 	ManyBodyBosonSpace
+	TransSector
 )
 
 foreach(name IN LISTS modules)

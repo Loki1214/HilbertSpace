@@ -11,6 +11,13 @@
 | Method     | Lowercase | Snake case |
 | Function   | Lowercase | Snake case |
 
+- Abbreviations
+
+| Word | Abbreviations |
+| :--- | :---: |
+| system size   | sysSize |
+| momentum | k |
+
 ## Coding conventions for mathematical objects
 
 - Correspondence between Fock states and array objects <br>
