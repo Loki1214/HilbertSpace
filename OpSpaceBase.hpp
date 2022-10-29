@@ -9,28 +9,28 @@
 #endif
 
 template<class Derived>
-struct OperatorSpaceTraits;
+struct OpSpaceTraits;
 
 template<class Derived>
-class OperatorSpaceBase {
+class OpSpaceBase {
 	public:
-		using BaseSpace  = typename OperatorSpaceTraits<Derived>::BaseSpace;
-		using Scalar     = typename OperatorSpaceTraits<Derived>::Scalar;
+		using BaseSpace  = typename OpSpaceTraits<Derived>::BaseSpace;
+		using Scalar     = typename OpSpaceTraits<Derived>::Scalar;
 		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
 
 	private:
 		BaseSpace m_baseSpace;
 
 	public:
-		__host__ __device__ OperatorSpaceBase(BaseSpace const& baseSpace)
+		__host__ __device__ OpSpaceBase(BaseSpace const& baseSpace)
 		    : m_baseSpace{baseSpace} {};
 
-		__host__ __device__ OperatorSpaceBase()                                       = default;
-		__host__ __device__ OperatorSpaceBase(OperatorSpaceBase const&)               = default;
-		__host__ __device__ OperatorSpaceBase& operator=(OperatorSpaceBase const&)    = default;
-		__host__ __device__                    OperatorSpaceBase(OperatorSpaceBase&&) = default;
-		__host__ __device__ OperatorSpaceBase& operator=(OperatorSpaceBase&&)         = default;
-		__host__                               __device__ ~OperatorSpaceBase()        = default;
+		__host__ __device__ OpSpaceBase()                                       = default;
+		__host__ __device__ OpSpaceBase(OpSpaceBase const&)               = default;
+		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase const&)    = default;
+		__host__ __device__                    OpSpaceBase(OpSpaceBase&&) = default;
+		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase&&)         = default;
+		__host__                               __device__ ~OpSpaceBase()        = default;
 
 		__host__ __device__ BaseSpace const& baseSpace() const { return m_baseSpace; }
 		__host__ __device__ size_t           baseDim() const { return m_baseSpace.dim(); }

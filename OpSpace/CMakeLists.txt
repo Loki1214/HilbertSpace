@@ -20,7 +20,7 @@ endif()
 
 include_directories(SYSTEM ../eigen)
 set(modules
-	OperatorSpace
+	OpSpace
 )
 
 foreach(name IN LISTS modules)

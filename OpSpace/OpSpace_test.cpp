@@ -1,12 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
-#include "../OperatorSpaceBase_test.hpp"
-#include "OperatorSpace.hpp"
+#include "../OpSpaceBase_test.hpp"
+#include "OpSpace.hpp"
 #include <complex>
 #include <iostream>
 
 using Scalar = std::complex<double>;
 
-TEST_CASE("OperatorSpace", "test") {
+TEST_CASE("OpSpace", "test") {
 	using Matrix       = Eigen::MatrixX<Scalar>;
 	constexpr Scalar I = Scalar(0, 1);
 
@@ -14,8 +14,8 @@ TEST_CASE("OperatorSpace", "test") {
 		for(size_t dim = 2; dim < 64; dim *= 2) {
 			std::cout << "dim = " << dim << std::endl;
 			HilbertSpace<int>     baseSpace(dim);
-			OperatorSpace<Scalar> opSpace(baseSpace);
-			test_OperatorSpace(opSpace);
+			OpSpace<Scalar> opSpace(baseSpace);
+			test_OpSpace(opSpace);
 			for(int rep = 0; rep != 100; ++rep)
 				REQUIRE(Matrix(opSpace.basisOp(0)) == Eigen::MatrixX<Scalar>::Identity(dim, dim));
 		}
@@ -23,8 +23,8 @@ TEST_CASE("OperatorSpace", "test") {
 	{
 		size_t                dim = 3;
 		HilbertSpace<int>     baseSpace(dim);
-		OperatorSpace<Scalar> opSpace(baseSpace);
-		test_OperatorSpace(opSpace);
+		OpSpace<Scalar> opSpace(baseSpace);
+		test_OpSpace(opSpace);
 
 		for(int rep = 0; rep != 100; ++rep)
 			REQUIRE(Matrix(opSpace.basisOp(0)) == Eigen::Matrix3<Scalar>::Identity());

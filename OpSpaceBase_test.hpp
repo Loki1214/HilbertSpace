@@ -3,13 +3,13 @@
 #define EIGEN_DEFAULT_IO_FORMAT \
 	Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ";\n", " ", "", "[", ";\n]")
 
-#include "OperatorSpaceBase.hpp"
+#include "OpSpaceBase.hpp"
 #include <Eigen/Dense>
 #include <iostream>
 
 template<class Derived>
-void test_OperatorSpace(OperatorSpaceBase<Derived>& opSpace) {
-	using Scalar = typename OperatorSpaceBase<Derived>::Scalar;
+void test_OpSpace(OpSpaceBase<Derived>& opSpace) {
+	using Scalar = typename OpSpaceBase<Derived>::Scalar;
 	Eigen::MatrixXd metric(opSpace.dim(), opSpace.dim());
 	auto            innerProduct = [&](size_t j, size_t k) {
         return Eigen::MatrixX<Scalar>(opSpace.basisOp(j).adjoint() * opSpace.basisOp(k)).trace();

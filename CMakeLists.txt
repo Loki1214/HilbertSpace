@@ -24,7 +24,7 @@ set(modules
 )
 add_subdirectory(Algorithm)
 add_subdirectory(ManyBodyHilbertSpace)
-add_subdirectory(OperatorSpace)
+add_subdirectory(OpSpace)
 
 foreach(name IN LISTS modules)
 	add_executable(${name}_test ${name}_test.cpp)

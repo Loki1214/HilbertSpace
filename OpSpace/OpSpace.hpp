@@ -1,28 +1,28 @@
 #pragma once
-#include "../OperatorSpaceBase.hpp"
+#include "../OpSpaceBase.hpp"
 #include "../HilbertSpace.hpp"
 #include <Eigen/Core>
 
 template<typename Scalar_>
-class OperatorSpace;
+class OpSpace;
 template<typename Scalar_>
-struct OperatorSpaceTraits< OperatorSpace<Scalar_> > {
+struct OpSpaceTraits< OpSpace<Scalar_> > {
 		using BaseSpace = HilbertSpace<int>;
 		using Scalar    = Scalar_;
 };
 
 template<typename Scalar_>
-class OperatorSpace : public OperatorSpaceBase< OperatorSpace<Scalar_> > {
+class OpSpace : public OpSpaceBase< OpSpace<Scalar_> > {
 	private:
-		using BaseSpace  = typename OperatorSpaceTraits<OperatorSpace>::BaseSpace;
+		using BaseSpace  = typename OpSpaceTraits<OpSpace>::BaseSpace;
 		using Scalar     = Scalar_;
 		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
 
 	public:
-		using OperatorSpaceBase< OperatorSpace >::OperatorSpaceBase;
+		using OpSpaceBase< OpSpace >::OpSpaceBase;
 
 	private:
-		friend OperatorSpaceBase< OperatorSpace >;
+		friend OpSpaceBase< OpSpace >;
 		__host__ __device__ size_t dim_impl() const { return this->baseDim() * this->baseDim(); }
 
 		__host__ __device__ void action_impl(size_t& resBasisNum, Scalar& coeff, size_t opNum,
