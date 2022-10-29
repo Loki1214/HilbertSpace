@@ -21,9 +21,9 @@ endif()
 include_directories(SYSTEM eigen)
 set(modules
 	HilbertSpace
-	ManyBodySpaceBase
 )
 add_subdirectory(Algorithm)
+add_subdirectory(ManyBodyHilbertSpace)
 
 foreach(name IN LISTS modules)
 	add_executable(${name}_test ${name}_test.cpp)
