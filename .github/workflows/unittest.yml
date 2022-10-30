@@ -13,4 +13,4 @@ jobs:
       - name: make
         run: cd build && make
       - name: ctest
-        run: cd build && ctest
+        run: cd build && ctest -V

@@ -20,6 +20,7 @@ endif()
 
 include_directories(SYSTEM ../eigen)
 set(modules
+	BaseConverter
 	IntegerComposition
 )
 
