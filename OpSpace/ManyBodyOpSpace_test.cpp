@@ -11,7 +11,7 @@
 using Scalar = std::complex<double>;
 
 TEST_CASE("ManyBodyOpSpace", "test") {
-	size_t const      LMax = 14;
+	size_t const      LMax = 15;
 	size_t const      dLoc = 2;
 	HilbertSpace<int> locSpace(dLoc);
 
