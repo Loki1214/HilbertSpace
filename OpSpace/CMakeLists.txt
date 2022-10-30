@@ -22,6 +22,7 @@ include_directories(SYSTEM ../eigen)
 set(modules
 	OpSpace
 	ManyBodyOpSpace
+	mBodyOpSpace
 )
 
 foreach(name IN LISTS modules)

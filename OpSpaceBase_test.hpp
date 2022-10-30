@@ -13,10 +13,10 @@ void test_OpSpace(OpSpaceBase<Derived>& opSpace) {
         return (opSpace.basisOp(j).adjoint() * opSpace.basisOp(k)).eval().diagonal().sum();
 	};
 
+	constexpr size_t                      nSample = 100;
 	std::random_device                    seed_gen;
 	std::default_random_engine            engine(seed_gen());
 	std::uniform_int_distribution<size_t> dist(0, opSpace.dim() - 1);
-	constexpr size_t                      nSample = 100;
 	Eigen::ArrayX<size_t>                 index;
 	if(nSample > opSpace.dim() * (opSpace.dim() + 1)) {
 		index.resize(opSpace.dim() * (opSpace.dim() + 1));
@@ -31,6 +31,7 @@ void test_OpSpace(OpSpaceBase<Derived>& opSpace) {
 	else {
 		index = index.NullaryExpr(2 * nSample, [&]() { return dist(engine); });
 	}
+
 #pragma omp parallel for
 	for(auto sample = 0; sample < index.size() / 2; ++sample) {
 		auto j = index(2 * sample);

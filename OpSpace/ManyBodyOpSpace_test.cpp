@@ -29,7 +29,7 @@ TEST_CASE("ManyBodyOpSpace", "test") {
 		ManyBodyOpSpace<decltype(mbSpace), Scalar> opSpace(mbSpace);
 		test_ManyBodySpaceBase(opSpace, 0, OpSpace<Scalar>(locSpace));
 		// test_OpSpace(opSpace);
-		for(size_t sysSize = 1; sysSize <= LMax; ++sysSize) {
+		for(size_t sysSize = LMax; sysSize <= LMax; ++sysSize) {
 			std::cout << "sysSize = " << sysSize << std::endl;
 			ManyBodySpinSpace                          mbSpace(sysSize, locSpace);
 			ManyBodyOpSpace<decltype(mbSpace), Scalar> opSpace(mbSpace);

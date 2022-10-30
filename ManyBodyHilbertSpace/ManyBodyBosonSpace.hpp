@@ -83,23 +83,18 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		}
 
 		template<typename... Args>
-		__host__ __device__ size_t translate_impl(size_t stateNum, int trans, Args...) const {
+		__host__ __device__ size_t translate_impl(size_t stateNum, int trans,
+		                                          Args&&... args) const {
 			assert(stateNum < this->dim());
 			assert(0 <= trans && static_cast<size_t>(trans) < this->sysSize());
-
-			Eigen::ArrayX<size_t> config(this->sysSize() + trans);
-			config.tail(this->sysSize()) = m_iComp.ordinal_to_config(stateNum);
-			config.head(trans)           = config.tail(trans);
-			return m_iComp.config_to_ordinal(config);
+			return m_iComp.translate(stateNum, trans, std::forward<Args>(args)...);
 		}
 
 		__host__ __device__ size_t reverse_impl(size_t stateNum) const {
 			assert(stateNum < this->dim());
 			auto config = m_iComp.ordinal_to_config(stateNum);
 			for(size_t l = 0; l != this->sysSize() / 2; ++l) {
-				auto temp                       = config(l);
-				config(l)                       = config(this->sysSize() - 1 - l);
-				config(this->sysSize() - 1 - l) = temp;
+				std::swap(config(l), config(this->sysSize() - 1 - l));
 			}
 			return m_iComp.config_to_ordinal(config);
 		}

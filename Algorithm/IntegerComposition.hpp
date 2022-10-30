@@ -81,6 +81,21 @@ class IntegerComposition {
 		}
 
 		__host__ __device__ size_t locNumber(size_t ordinal, int const pos) const;
+
+		template<class Array>
+		__host__ __device__ size_t translate(size_t const ordinal, int trans, Array& work) const {
+			assert(ordinal < this->dim());
+			assert(0 <= trans && static_cast<size_t>(trans) < this->length());
+			assert(static_cast<size_t>(work.size()) >= this->length() + trans);
+			work.tail(this->length()) = this->ordinal_to_config(ordinal);
+			work.head(trans)          = work.tail(trans);
+			return this->config_to_ordinal(work);
+		}
+
+		__host__ __device__ size_t translate(size_t const ordinal, int trans) const {
+			Eigen::ArrayX<size_t> config(m_Length + trans);
+			return this->translate(ordinal, trans, config);
+		}
 };
 
 inline IntegerComposition::IntegerComposition(size_t N, size_t Length, size_t Max)
