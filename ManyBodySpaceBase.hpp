@@ -10,6 +10,8 @@
 
 template<class Derived>
 struct ManyBodySpaceTraits;
+// OpSpaceTraits should define the following properties:
+// - LocalSpace
 
 template<class Derived>
 class ManyBodySpaceBase : public HilbertSpace<Derived> {
@@ -41,10 +43,10 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		__host__ __device__ size_t            dimLoc() const { return m_locSpace.dim(); }
 
 		// Statically polymorphic functions
-		__host__ __device__ int locState(int stateNum, int pos) const {
+		__host__ __device__ size_t locState(size_t stateNum, int pos) const {
 			return static_cast<Derived const*>(this)->locState_impl(stateNum, pos);
 		}
-		__host__ __device__ Eigen::RowVectorXi ordinal_to_config(size_t stateNum) const {
+		__host__ __device__ Eigen::RowVectorX<size_t> ordinal_to_config(size_t stateNum) const {
 			return static_cast<Derived const*>(this)->ordinal_to_config_impl(stateNum);
 		}
 		template<class Array>
@@ -56,45 +58,47 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		/* @{ */
 
 	private:
-		mutable Eigen::ArrayXi m_transEqClassRep;
-		mutable Eigen::ArrayXi m_transPeriod;
-		mutable Eigen::ArrayXi m_stateToTransEqClass;
-		mutable Eigen::ArrayXi m_stateToTransShift;
+		mutable Eigen::ArrayX<size_t> m_transEqClassRep;
+		mutable Eigen::ArrayX<size_t> m_transPeriod;
+		mutable Eigen::ArrayX<size_t> m_stateToTransEqClass;
+		mutable Eigen::ArrayX<size_t> m_stateToTransShift;
 
 	public:
 		__host__ void compute_transEqClass() const;
 
 		__host__ __device__ size_t transEqDim() const { return m_transEqClassRep.size(); }
 
-		__host__ __device__ Eigen::ArrayXi const& transEqClassRep() const {
+		__host__ __device__ Eigen::ArrayX<size_t> const& transEqClassRep() const {
 			return m_transEqClassRep;
 		}
-		__host__ __device__ int transEqClassRep(int eqClassNum) const {
+		__host__ __device__ size_t transEqClassRep(size_t eqClassNum) const {
 			return m_transEqClassRep(eqClassNum);
 		}
 
-		__host__ __device__ Eigen::ArrayXi const& transPeriod() const { return m_transPeriod; }
-		__host__ __device__ int                   transPeriod(int eqClassNum) const {
-			                  return m_transPeriod(eqClassNum);
+		__host__ __device__ Eigen::ArrayX<size_t> const& transPeriod() const {
+			return m_transPeriod;
+		}
+		__host__ __device__ size_t transPeriod(size_t eqClassNum) const {
+			return m_transPeriod(eqClassNum);
 		}
 
-		__host__ __device__ int state_to_transEqClass(int stateNum) const {
+		__host__ __device__ size_t state_to_transEqClass(size_t stateNum) const {
 			return m_stateToTransEqClass(stateNum);
 		}
-		__host__ __device__ int state_to_transPeriod(int stateNum) const {
+		__host__ __device__ size_t state_to_transPeriod(size_t stateNum) const {
 			auto eqClass = this->state_to_transEqClass(stateNum);
 			return this->transPeriod(eqClass);
 		}
-		__host__ __device__ int state_to_transShift(int stateNum) const {
+		__host__ __device__ size_t state_to_transShift(size_t stateNum) const {
 			return m_stateToTransShift(stateNum);
 		}
 
 		// Statically polymorphic functions
-		__host__ __device__ int translate(int stateNum, int trans) const {
+		__host__ __device__ size_t translate(size_t stateNum, int trans) const {
 			return static_cast<Derived const*>(this)->translate_impl(stateNum, trans);
 		}
 		template<class Array>
-		__host__ __device__ int translate(int stateNum, int trans, Array& work) const {
+		__host__ __device__ size_t translate(size_t stateNum, int trans, Array& work) const {
 			return static_cast<Derived const*>(this)->translate_impl(stateNum, trans, work);
 		}
 		/* @} */
@@ -104,7 +108,7 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 
 	public:
 		// Statically polymorphic functions
-		__host__ __device__ int reverse(int stateNum) const {
+		__host__ __device__ size_t reverse(size_t stateNum) const {
 			return static_cast<Derived const*>(this)->reverse_impl(stateNum);
 		}
 		/* @} */
@@ -116,15 +120,14 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 	if(this->dim() <= 0) return;
 
 	Eigen::ArrayX<bool> calculated = Eigen::ArrayX<bool>::Zero(this->dim());
-	int                 eqClassNum = 0;
-	size_t              period;
-	int                 translated;
+	size_t              eqClassNum = 0;
+	size_t              period, translated;
 	for(size_t stateNum = 0; stateNum < this->dim(); ++stateNum) {
 		if(calculated(stateNum)) continue;
 		calculated(stateNum) = true;
 		for(period = 1; period < this->sysSize(); ++period) {
 			translated = this->translate(stateNum, period);
-			if(translated == static_cast<int>(stateNum)) break;
+			if(translated == stateNum) break;
 			calculated(translated) = true;
 		}
 		eqClassNum += 1;
@@ -144,7 +147,7 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 
 		for(period = 1; period < this->sysSize(); ++period) {
 			translated = this->translate(stateNum, period);
-			if(translated == static_cast<int>(stateNum)) break;
+			if(translated == stateNum) break;
 			calculated(translated)            = true;
 			m_stateToTransEqClass(translated) = eqClassNum;
 			m_stateToTransShift(translated)   = period;
@@ -153,5 +156,5 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 		m_transPeriod(eqClassNum)     = period;
 		eqClassNum += 1;
 	}
-	assert(eqClassNum == m_transEqClassRep.size());
+	assert(eqClassNum == static_cast<size_t>(m_transEqClassRep.size()));
 }

@@ -10,6 +10,9 @@
 
 template<class Derived>
 struct OpSpaceTraits;
+// OpSpaceTraits should define the following properties:
+// - BaseSpace
+// - Scalar
 
 template<class Derived>
 class OpSpaceBase {
@@ -22,15 +25,18 @@ class OpSpaceBase {
 		BaseSpace m_baseSpace;
 
 	public:
-		__host__ __device__ OpSpaceBase(BaseSpace const& baseSpace)
-		    : m_baseSpace{baseSpace} {};
+		__host__ __device__ OpSpaceBase(BaseSpace const& baseSpace) : m_baseSpace{baseSpace} {};
 
-		__host__ __device__ OpSpaceBase()                                       = default;
-		__host__ __device__ OpSpaceBase(OpSpaceBase const&)               = default;
-		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase const&)    = default;
-		__host__ __device__                    OpSpaceBase(OpSpaceBase&&) = default;
-		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase&&)         = default;
-		__host__                               __device__ ~OpSpaceBase()        = default;
+		__host__ __device__              OpSpaceBase()                   = default;
+		__host__ __device__              OpSpaceBase(OpSpaceBase const&) = default;
+		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase const&)   = default;
+		__host__ __device__              OpSpaceBase(OpSpaceBase&&)      = default;
+		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase&&)        = default;
+		__host__                         __device__ ~OpSpaceBase()       = default;
+
+		__host__ __device__ bool operator==(OpSpaceBase const& other) const {
+			return m_baseSpace == other.m_baseSpace;
+		}
 
 		__host__ __device__ BaseSpace const& baseSpace() const { return m_baseSpace; }
 		__host__ __device__ size_t           baseDim() const { return m_baseSpace.dim(); }

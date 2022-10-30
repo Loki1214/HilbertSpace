@@ -73,13 +73,14 @@ class IntegerComposition {
 		template<class Array>
 		__host__ __device__ void ordinal_to_config(Array& vec, size_t const ordinal) const;
 
-		__host__ __device__ Eigen::RowVectorXi ordinal_to_config(size_t const ordinal) const {
-			Eigen::RowVectorXi res(this->length());
+		__host__ __device__ Eigen::RowVectorX<size_t> ordinal_to_config(
+		    size_t const ordinal) const {
+			Eigen::RowVectorX<size_t> res(this->length());
 			this->ordinal_to_config(res, ordinal);
 			return res;
 		}
 
-		__host__ __device__ int locNumber(size_t ordinal, int const pos) const;
+		__host__ __device__ size_t locNumber(size_t ordinal, int const pos) const;
 };
 
 inline IntegerComposition::IntegerComposition(size_t N, size_t Length, size_t Max)
@@ -161,8 +162,9 @@ __host__ __device__ inline void IntegerComposition::ordinal_to_config(Array&    
 	config[0] = m_N - z;
 }
 
-__host__ __device__ inline int IntegerComposition::locNumber(size_t ordinal, int const pos) const {
-	assert(0 <= pos && pos < static_cast<int>(this->length()));
+__host__ __device__ inline size_t IntegerComposition::locNumber(size_t    ordinal,
+                                                                int const pos) const {
+	assert(0 <= pos && static_cast<size_t>(pos) < this->length());
 	size_t z = 0, zPrev = 0;
 	for(size_t l = 1; l != m_Length - pos; ++l) {
 		while(m_workA(z, l) <= ordinal) z += 1;

@@ -21,6 +21,7 @@ endif()
 include_directories(SYSTEM ../eigen)
 set(modules
 	OpSpace
+	ManyBodyOpSpace
 )
 
 foreach(name IN LISTS modules)

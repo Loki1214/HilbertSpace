@@ -1,3 +1,7 @@
+#define EIGEN_DONT_PARALLELIZE
+#define EIGEN_DEFAULT_IO_FORMAT \
+	Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ";\n", " ", "", "[", ";\n]")
+
 #include <catch2/catch_test_macros.hpp>
 #include "../OpSpaceBase_test.hpp"
 #include "OpSpace.hpp"
