@@ -59,16 +59,16 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum)
 		REQUIRE(appeared(stateNum) == 1);
 
-		// test for state_to_transEqClass
-		// test for state_to_transShift
-#pragma omp parallel for
-	for(auto sample = 0; sample < index.size(); ++sample) {
-		size_t     stateNum   = index(sample);
-		auto const eqClass    = mbSpace.state_to_transEqClass(stateNum);
-		auto const eqClassRep = mbSpace.transEqClassRep(eqClass);
-		auto const trans      = mbSpace.state_to_transShift(stateNum);
-		REQUIRE(stateNum == mbSpace.translate(eqClassRep, trans));
-	}
+// 		// test for state_to_transEqClass
+// 		// test for state_to_transShift
+// #pragma omp parallel for
+// 	for(auto sample = 0; sample < index.size(); ++sample) {
+// 		size_t     stateNum   = index(sample);
+// 		auto const eqClass    = mbSpace.state_to_transEqClass(stateNum);
+// 		auto const eqClassRep = mbSpace.transEqClassRep(eqClass);
+// 		auto const trans      = mbSpace.state_to_transShift(stateNum);
+// 		REQUIRE(stateNum == mbSpace.translate(eqClassRep, trans));
+// 	}
 
 	// test for reverse()
 #pragma omp parallel for

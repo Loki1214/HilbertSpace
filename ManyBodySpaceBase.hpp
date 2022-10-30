@@ -111,8 +111,7 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 	if(m_transEqClass.size() >= 1) return;
 	if(this->dim() <= 0) return;
 
-	Eigen::ArrayX<bool> calculated;
-	calculated = Eigen::ArrayX<bool>::Zero(this->dim());
+	Eigen::ArrayX<bool> calculated = Eigen::ArrayX<bool>::Zero(this->dim());
 	m_transEqClass.resize(this->dim());
 	Eigen::ArrayXX<size_t> translated(this->sysSize(), omp_get_max_threads());
 #pragma omp parallel for schedule(dynamic, 10)
@@ -147,12 +146,12 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 	    = std::unique(m_transEqClass.begin(), m_transEqClass.end()) - m_transEqClass.begin();
 	m_transEqClass.conservativeResize(numEqClass);
 
-	m_stateToTransEqClass.resize(this->dim());
-#pragma omp parallel for schedule(dynamic, 10)
-	for(auto eqClass = 0; eqClass < m_transEqClass.size(); ++eqClass) {
-		for(auto trans = 0; trans != this->transPeriod(eqClass); ++trans) {
-			auto const state             = this->translate(this->transEqClassRep(eqClass), trans);
-			m_stateToTransEqClass(state) = std::make_pair(eqClass, trans);
-		}
-	}
+	// 	m_stateToTransEqClass.resize(this->dim());
+	// #pragma omp parallel for schedule(dynamic, 10)
+	// 	for(auto eqClass = 0; eqClass < m_transEqClass.size(); ++eqClass) {
+	// 		for(auto trans = 0; trans != this->transPeriod(eqClass); ++trans) {
+	// 			auto const state             = this->translate(this->transEqClassRep(eqClass), trans);
+	// 			m_stateToTransEqClass(state) = std::make_pair(eqClass, trans);
+	// 		}
+	// 	}
 }
