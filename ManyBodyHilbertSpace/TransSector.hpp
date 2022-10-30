@@ -60,7 +60,7 @@ class TransSector : public SubSpace<TotalSpace_, Scalar> {
 				if(!isCompatible(eqClass)) continue;
 				Real const norm = Real(sqrt(Real(this->totalSpace().transPeriod(eqClass))));
 
-				for(size_t trans = 0; trans != this->totalSpace().transPeriod(eqClass); ++trans) {
+				for(auto trans = 0; trans != this->totalSpace().transPeriod(eqClass); ++trans) {
 					auto const eqClassRep = this->totalSpace().transEqClassRep(eqClass);
 					auto const stateNum   = this->totalSpace().translate(eqClassRep, trans);
 					this->basis().insert(stateNum, basisNum)

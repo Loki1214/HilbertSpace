@@ -2,6 +2,7 @@
 
 #include "HilbertSpace.hpp"
 #include <Eigen/Dense>
+#include <iostream>
 
 #ifndef __NVCC__
 	#define __host__
@@ -58,39 +59,30 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		/* @{ */
 
 	private:
-		mutable Eigen::ArrayX<size_t> m_transEqClassRep;
-		mutable Eigen::ArrayX<size_t> m_transPeriod;
-		mutable Eigen::ArrayX<size_t> m_stateToTransEqClass;
-		mutable Eigen::ArrayX<size_t> m_stateToTransShift;
+		mutable Eigen::ArrayX<std::pair<size_t, int>> m_transEqClass;
+		mutable Eigen::ArrayX<std::pair<size_t, int>> m_stateToTransEqClass;
 
 	public:
 		__host__ void compute_transEqClass() const;
 
-		__host__ __device__ size_t transEqDim() const { return m_transEqClassRep.size(); }
+		__host__ __device__ size_t transEqDim() const { return m_transEqClass.size(); }
 
-		__host__ __device__ Eigen::ArrayX<size_t> const& transEqClassRep() const {
-			return m_transEqClassRep;
-		}
 		__host__ __device__ size_t transEqClassRep(size_t eqClassNum) const {
-			return m_transEqClassRep(eqClassNum);
+			return m_transEqClass(eqClassNum).first;
 		}
-
-		__host__ __device__ Eigen::ArrayX<size_t> const& transPeriod() const {
-			return m_transPeriod;
-		}
-		__host__ __device__ size_t transPeriod(size_t eqClassNum) const {
-			return m_transPeriod(eqClassNum);
+		__host__ __device__ int transPeriod(size_t eqClassNum) const {
+			return m_transEqClass(eqClassNum).second;
 		}
 
 		__host__ __device__ size_t state_to_transEqClass(size_t stateNum) const {
-			return m_stateToTransEqClass(stateNum);
+			return m_stateToTransEqClass(stateNum).first;
 		}
-		__host__ __device__ size_t state_to_transPeriod(size_t stateNum) const {
+		__host__ __device__ int state_to_transShift(size_t stateNum) const {
+			return m_stateToTransEqClass(stateNum).second;
+		}
+		__host__ __device__ int state_to_transPeriod(size_t stateNum) const {
 			auto eqClass = this->state_to_transEqClass(stateNum);
 			return this->transPeriod(eqClass);
-		}
-		__host__ __device__ size_t state_to_transShift(size_t stateNum) const {
-			return m_stateToTransShift(stateNum);
 		}
 
 		// Statically polymorphic functions
@@ -116,45 +108,51 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 
 template<class Derived>
 __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
-	if(m_transEqClassRep.size() >= 1) return;
+	if(m_transEqClass.size() >= 1) return;
 	if(this->dim() <= 0) return;
 
-	Eigen::ArrayX<bool> calculated = Eigen::ArrayX<bool>::Zero(this->dim());
-	size_t              eqClassNum = 0;
-	size_t              period, translated;
-	for(size_t stateNum = 0; stateNum < this->dim(); ++stateNum) {
+	Eigen::ArrayX<bool> calculated;
+	calculated = Eigen::ArrayX<bool>::Zero(this->dim());
+	m_transEqClass.resize(this->dim());
+	Eigen::ArrayXX<size_t> translated(this->sysSize(), omp_get_max_threads());
+#pragma omp parallel for schedule(dynamic, 10)
+	for(size_t stateNum = 0; stateNum != this->dim(); ++stateNum) {
 		if(calculated(stateNum)) continue;
 		calculated(stateNum) = true;
-		for(period = 1; period < this->sysSize(); ++period) {
-			translated = this->translate(stateNum, period);
-			if(translated == stateNum) break;
-			calculated(translated) = true;
-		}
-		eqClassNum += 1;
-	}
 
-	m_transEqClassRep.resize(eqClassNum);
-	m_transPeriod.resize(eqClassNum);
+		auto const threadId        = omp_get_thread_num();
+		bool       duplicationFlag = false;
+		size_t     trans, eqClassRep = stateNum;
+		translated(0, threadId) = stateNum;
+		for(trans = 1; trans != this->sysSize(); ++trans) {
+			auto const transed          = this->translate(stateNum, trans);
+			translated(trans, threadId) = transed;
+			if(transed == stateNum) break;
+			eqClassRep = (transed < eqClassRep ? transed : eqClassRep);
+			if(transed == eqClassRep && calculated(transed)) {
+				duplicationFlag = true;
+				break;
+			}
+			calculated(transed) = true;
+		}
+		if(duplicationFlag) continue;
+		auto const period = trans;
+		for(trans = 0; trans != period; ++trans) {
+			m_transEqClass(translated(trans, threadId)) = std::make_pair(eqClassRep, period);
+		}
+	}
+	std::sort(m_transEqClass.begin(), m_transEqClass.end(),
+	          [&](auto const& lhs, auto const& rhs) { return lhs.first < rhs.first; });
+	size_t const numEqClass
+	    = std::unique(m_transEqClass.begin(), m_transEqClass.end()) - m_transEqClass.begin();
+	m_transEqClass.conservativeResize(numEqClass);
+
 	m_stateToTransEqClass.resize(this->dim());
-	m_stateToTransShift.resize(this->dim());
-	calculated = Eigen::ArrayX<bool>::Zero(this->dim());
-	eqClassNum = 0;
-	for(size_t stateNum = 0; stateNum < this->dim(); ++stateNum) {
-		if(calculated(stateNum)) continue;
-		calculated(stateNum)            = true;
-		m_stateToTransEqClass(stateNum) = eqClassNum;
-		m_stateToTransShift(stateNum)   = 0;
-
-		for(period = 1; period < this->sysSize(); ++period) {
-			translated = this->translate(stateNum, period);
-			if(translated == stateNum) break;
-			calculated(translated)            = true;
-			m_stateToTransEqClass(translated) = eqClassNum;
-			m_stateToTransShift(translated)   = period;
+#pragma omp parallel for schedule(dynamic, 10)
+	for(auto eqClass = 0; eqClass < m_transEqClass.size(); ++eqClass) {
+		for(auto trans = 0; trans != this->transPeriod(eqClass); ++trans) {
+			auto const state             = this->translate(this->transEqClassRep(eqClass), trans);
+			m_stateToTransEqClass(state) = std::make_pair(eqClass, trans);
 		}
-		m_transEqClassRep(eqClassNum) = stateNum;
-		m_transPeriod(eqClassNum)     = period;
-		eqClassNum += 1;
 	}
-	assert(eqClassNum == static_cast<size_t>(m_transEqClassRep.size()));
 }
