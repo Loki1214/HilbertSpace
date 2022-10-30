@@ -54,9 +54,9 @@ class ManyBodyOpSpace : public ManyBodyOpSpaceBase< ManyBodyOpSpace<BaseSpace_, 
 		/*! @name Implementation for methods of ancestor class OpSpaceBase */
 		/* @{ */
 		friend OpSpaceBase< ManyBodyOpSpace >;
-		__host__ __device__ void action_impl(size_t& resBasisNum, Scalar& coeff, size_t opNum,
+		__host__ __device__ void action_impl(size_t& resStateNum, Scalar& coeff, size_t opNum,
 		                                     size_t basisNum) const {
-			resBasisNum = basisNum;
+			resStateNum = basisNum;
 			coeff       = {1, 0};
 			size_t base = 1;
 			for(size_t pos = 0; pos != this->sysSize(); ++pos, base *= this->baseSpace().dimLoc()) {
@@ -65,11 +65,11 @@ class ManyBodyOpSpace : public ManyBodyOpSpaceBase< ManyBodyOpSpace<BaseSpace_, 
 				auto [resLocBasisNum, resLocCoeff] = this->locSpace().action(locOpNum, locBasisNum);
 				if(abs(resLocCoeff) == 0) {
 					coeff       = 0;
-					resBasisNum = basisNum;
+					resStateNum = basisNum;
 					break;
 				}
 				coeff *= resLocCoeff;
-				resBasisNum
+				resStateNum
 				    += (static_cast<int>(resLocBasisNum) - static_cast<int>(locBasisNum)) * base;
 			}
 		}

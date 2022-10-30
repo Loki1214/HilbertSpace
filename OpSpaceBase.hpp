@@ -42,10 +42,10 @@ class OpSpaceBase {
 		__host__ __device__ size_t           baseDim() const { return m_baseSpace.dim(); }
 
 		__host__ __device__ std::pair<size_t, Scalar> action(size_t opNum, size_t basisNum) const {
-			size_t resBasisNum;
+			size_t resStateNum;
 			Scalar coeff;
-			this->action(resBasisNum, coeff, opNum, basisNum);
-			return std::make_pair(resBasisNum, coeff);
+			this->action(resStateNum, coeff, opNum, basisNum);
+			return std::make_pair(resStateNum, coeff);
 		}
 
 		__host__ void basisOp(Eigen::SparseMatrix<Scalar>& res, size_t opNum) const {
@@ -53,8 +53,8 @@ class OpSpaceBase {
 			res.reserve(Eigen::VectorXi::Constant(this->baseDim(), 1));
 #pragma omp parallel for
 			for(size_t basisNum = 0; basisNum < this->baseDim(); ++basisNum) {
-				auto [resBasisNum, coeff]           = this->action(opNum, basisNum);
-				res.coeffRef(resBasisNum, basisNum) = coeff;
+				auto [resStateNum, coeff]           = this->action(opNum, basisNum);
+				res.coeffRef(resStateNum, basisNum) = coeff;
 			}
 			res.makeCompressed();
 		}
@@ -71,9 +71,9 @@ class OpSpaceBase {
 		}
 
 		template<class... Args>
-		__host__ __device__ void action(size_t& resBasisNum, Scalar& coeff, size_t opNum,
+		__host__ __device__ void action(size_t& resStateNum, Scalar& coeff, size_t opNum,
 		                                size_t basisNum, Args&&... args) const {
-			static_cast<Derived const*>(this)->action_impl(resBasisNum, coeff, opNum, basisNum,
+			static_cast<Derived const*>(this)->action_impl(resStateNum, coeff, opNum, basisNum,
 			                                               args...);
 		}
 

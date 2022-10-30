@@ -57,7 +57,7 @@ TEST_CASE("BaseConverter", "test") {
 	}
 	{
 		size_t dLoc = 4;
-		for(size_t L = 0; L <= 16; ++L) {
+		for(size_t L = 0; L <= LMax; ++L) {
 			std::cout << "dloc = " << dLoc << ", L = " << L << std::endl;
 			BaseConverter<size_t> bConv(dLoc, L);
 			test_BaseConverter(bConv, dLoc, L, powi(dLoc, L));
