@@ -9,7 +9,7 @@ template<class Derived>
 void test_OpSpace(OpSpaceBase<Derived>& opSpace) {
 	std::cout << "opSpace.dim() = " << opSpace.dim() << std::endl;
 	constexpr double precision    = 1.0e-12;
-	auto             innerProduct = [&](size_t j, size_t k) {
+	auto const       innerProduct = [&](size_t j, size_t k) {
         return (opSpace.basisOp(j).adjoint() * opSpace.basisOp(k)).eval().diagonal().sum();
 	};
 
@@ -37,6 +37,9 @@ void test_OpSpace(OpSpaceBase<Derived>& opSpace) {
 		auto j = index(2 * sample);
 		auto k = index(2 * sample + 1);
 		REQUIRE(abs(opSpace.opHSNormSq(j) - abs(innerProduct(j, j))) < precision);
-		if(j != k) REQUIRE(abs(innerProduct(j, k)) < precision);
+		if(j != k) {
+			REQUIRE(abs(opSpace.opHSNormSq(k) - abs(innerProduct(k, k))) < precision);
+			REQUIRE(abs(innerProduct(j, k)) < precision);
+		}
 	}
 }
