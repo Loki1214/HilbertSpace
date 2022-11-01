@@ -13,6 +13,6 @@ jobs:
       - name: cmake
         run: mkdir build && cd build && cmake ..
       - name: make
-        run: cd build && make
+        run: cd build && make VERBOSE=1
       - name: ctest
-        run: cd build && ctest -V --rerun-failed --output-on-failure
+        run: cd build && ctest -V --output-on-failure
