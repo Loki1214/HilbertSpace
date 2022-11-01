@@ -14,10 +14,7 @@ endif()
 enable_testing()
 
 find_package(Eigen3 REQUIRED)
-
-# For OpenMP
 find_package(OpenMP REQUIRED)
-
 
 set(modules
 	HilbertSpace
