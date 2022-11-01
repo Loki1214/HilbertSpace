@@ -1,5 +1,6 @@
 #pragma once
 #include "../ManyBodySpaceBase.hpp"
+#include "../SubSpace.hpp"
 
 template<class TotalSpace_, typename Scalar,
          typename std::enable_if_t<
