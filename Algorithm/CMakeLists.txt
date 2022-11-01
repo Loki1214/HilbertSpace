@@ -16,8 +16,6 @@ enable_testing()
 find_package(Eigen3 REQUIRED)
 find_package(OpenMP REQUIRED)
 
-
-include_directories(SYSTEM ../eigen)
 set(modules
 	BaseConverter
 	IntegerComposition
