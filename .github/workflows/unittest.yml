@@ -11,8 +11,8 @@ jobs:
       - name: Install Eigen3
         run: |
           wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
-          tar zxvf eigen-3.4.0.tar.gz
-          sudo mv eigen-3.4.0 /usr/include/eigen3
+          tar zxv eigen-3.4.0.tar.gz
+          cd eigen-3.4.0 & cmake . && make install
       - name: cmake
         run: mkdir build && cd build && cmake ..
       - name: make
