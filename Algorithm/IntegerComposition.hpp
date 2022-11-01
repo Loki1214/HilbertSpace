@@ -7,25 +7,28 @@
 	#define __device__
 #endif
 
-#if __has_include(<omp.h>)
-	#include <omp.h>
+#ifndef CUSTOM_OMP_FUNCTIONS
+	#define CUSTOM_OMP_FUNCTIONS
+	#if __has_include(<omp.h>)
+		#include <omp.h>
 __host__ __device__ static inline int get_max_threads() {
-	#ifdef __CUDA_ARCH__
+		#ifdef __CUDA_ARCH__
 	return 1;
-	#else
+		#else
 	return omp_get_max_threads();
-	#endif
+		#endif
 }
 __host__ __device__ static inline int get_thread_num() {
-	#ifdef __CUDA_ARCH__
+		#ifdef __CUDA_ARCH__
 	return 0;
-	#else
+		#else
 	return omp_get_thread_num();
-	#endif
+		#endif
 }
-#else
+	#else
 constexpr static inline int get_max_threads() { return 1; }
 constexpr static inline int get_thread_num() { return 0; }
+	#endif
 #endif
 
 template<class T>
