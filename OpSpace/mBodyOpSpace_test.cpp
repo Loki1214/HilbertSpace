@@ -33,8 +33,8 @@ TEST_CASE("ManyBodyOpSpace", "test") {
 				std::cout << "sysSize = " << sysSize << ", m = " << m << std::endl;
 				mBodyOpSpace<decltype(mbSpace), Scalar> opSpace(m, mbSpace);
 				if(m > 4 && opSpace.dim() > 100000000) {
-					std::cout << "opSpace.dim() = "
-					          << opSpace.dim() " is so large. Skipping test..." << std::endl;
+					std::cout << "opSpace.dim() = " << opSpace.dim()
+					          << " is so large. Skipping test..." << std::endl;
 					continue;
 				}
 				test_ManyBodySpaceBase(opSpace, sysSize, OpSpace<Scalar>(locSpace));
