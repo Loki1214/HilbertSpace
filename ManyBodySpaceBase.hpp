@@ -35,9 +35,9 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 
 		__host__ __device__ ManyBodySpaceBase()                                          = default;
 		__host__ __device__ ManyBodySpaceBase(ManyBodySpaceBase const& other)            = default;
-		__host__ __device__ ManyBodySpaceBase& operator=(ManyBodySpaceBase const& other) = delete;
+		__host__ __device__ ManyBodySpaceBase& operator=(ManyBodySpaceBase const& other) = default;
 		__host__ __device__ ManyBodySpaceBase(ManyBodySpaceBase&& other)                 = default;
-		__host__ __device__ ManyBodySpaceBase& operator=(ManyBodySpaceBase&& other)      = delete;
+		__host__ __device__ ManyBodySpaceBase& operator=(ManyBodySpaceBase&& other)      = default;
 		__host__                               __device__ ~ManyBodySpaceBase()           = default;
 
 		__host__ __device__ size_t            sysSize() const { return m_sysSize; }
