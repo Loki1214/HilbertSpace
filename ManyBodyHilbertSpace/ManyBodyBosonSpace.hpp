@@ -10,8 +10,12 @@ struct ManyBodySpaceTraits<ManyBodyBosonSpace> {
 
 class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 	private:
-		using Base       = ManyBodySpaceBase<ManyBodyBosonSpace>;
-		using LocalSpace = typename ManyBodySpaceTraits<ManyBodyBosonSpace>::LocalSpace;
+		using Base = ManyBodySpaceBase<ManyBodyBosonSpace>;
+
+	public:
+		using LocalSpace = typename Base::LocalSpace;
+
+	private:
 		IntegerComposition m_iComp;
 
 	public:

@@ -23,13 +23,16 @@ template<typename Scalar_>
 class mBodyOpSpace<ManyBodySpinSpace, Scalar_>
     : public ManyBodyOpSpaceBase< mBodyOpSpace<ManyBodySpinSpace, Scalar_> > {
 	private:
-		using Self       = mBodyOpSpace<ManyBodySpinSpace, Scalar_>;
-		using Base       = ManyBodyOpSpaceBase<Self>;
-		using BaseSpace  = typename OpSpaceTraits<Self>::BaseSpace;
-		using Scalar     = typename OpSpaceTraits<Self>::Scalar;
-		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
-		using LocalSpace = typename ManyBodySpaceTraits<Self>::LocalSpace;
+		using Self = mBodyOpSpace<ManyBodySpinSpace, Scalar_>;
+		using Base = ManyBodyOpSpaceBase<Self>;
 
+	public:
+		using BaseSpace  = typename Base::BaseSpace;
+		using Scalar     = typename Base::Scalar;
+		using RealScalar = typename Base::RealScalar;
+		using LocalSpace = typename Base::LocalSpace;
+
+	private:
 		size_t                m_mBody = 0;
 		IntegerComposition    m_actingSites;
 		BaseConverter<size_t> m_opConfig;

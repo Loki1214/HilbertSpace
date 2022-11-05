@@ -19,12 +19,14 @@ struct ManyBodySpaceTraits< ManyBodyOpSpace<BaseSpace_, Scalar_> > {
 template<class BaseSpace_, typename Scalar_>
 class ManyBodyOpSpace : public ManyBodyOpSpaceBase< ManyBodyOpSpace<BaseSpace_, Scalar_> > {
 	private:
-		using Self       = ManyBodyOpSpace<BaseSpace_, Scalar_>;
-		using Base       = ManyBodyOpSpaceBase<Self>;
-		using BaseSpace  = typename OpSpaceTraits<Self>::BaseSpace;
-		using Scalar     = typename OpSpaceTraits<Self>::Scalar;
-		using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
-		using LocalSpace = typename ManyBodySpaceTraits<Self>::LocalSpace;
+		using Self = ManyBodyOpSpace<BaseSpace_, Scalar_>;
+		using Base = ManyBodyOpSpaceBase<Self>;
+
+	public:
+		using BaseSpace  = typename Base::BaseSpace;
+		using Scalar     = typename Base::Scalar;
+		using RealScalar = typename Base::RealScalar;
+		using LocalSpace = typename Base::LocalSpace;
 
 	public:
 		/**

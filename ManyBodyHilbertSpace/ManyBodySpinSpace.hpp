@@ -9,7 +9,9 @@ struct ManyBodySpaceTraits<ManyBodySpinSpace> {
 class ManyBodySpinSpace : public ManyBodySpaceBase<ManyBodySpinSpace> {
 	private:
 		using Base       = ManyBodySpaceBase<ManyBodySpinSpace>;
-		using LocalSpace = typename ManyBodySpaceTraits<ManyBodySpinSpace>::LocalSpace;
+
+	public:
+		using LocalSpace = typename Base::LocalSpace;
 
 	public:
 		/**

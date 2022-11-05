@@ -18,6 +18,7 @@ find_package(OpenMP REQUIRED)
 
 set(modules
 	HilbertSpace
+	RandomMatrixEnsemble
 )
 add_subdirectory(Algorithm)
 add_subdirectory(ManyBodyHilbertSpace)

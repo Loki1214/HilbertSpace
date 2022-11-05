@@ -11,9 +11,11 @@
 template<class Derived>
 class ManyBodyOpSpaceBase : public OpSpaceBase<Derived>,
                             public ManyBodySpaceBase<Derived> {
-	private:
-		using BaseSpace  = typename OpSpaceTraits< Derived >::BaseSpace;
-		using LocalSpace = typename ManyBodySpaceTraits< Derived >::LocalSpace;
+	public:
+		using BaseSpace  = typename OpSpaceBase<Derived>::BaseSpace;
+		using Scalar     = typename OpSpaceBase<Derived>::Scalar;
+		using RealScalar = typename OpSpaceBase<Derived>::RealScalar;
+		using LocalSpace = typename ManyBodySpaceBase<Derived>::LocalSpace;
 
 	public:
 		using ManyBodySpaceBase<Derived>::dim;

@@ -16,9 +16,10 @@ struct ManyBodySpaceTraits;
 
 template<class Derived>
 class ManyBodySpaceBase : public HilbertSpace<Derived> {
-	private:
+	public:
 		using LocalSpace = typename ManyBodySpaceTraits<Derived>::LocalSpace;
 
+	private:
 		size_t     m_sysSize = 0;
 		LocalSpace m_locSpace;
 
