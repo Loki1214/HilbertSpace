@@ -5,6 +5,9 @@
 	#define __device__
 #endif
 
+#include <cstddef>
+using std::size_t;
+
 template<class Derived>
 class HilbertSpace;
 
