@@ -9,6 +9,30 @@
 	#define __device__
 #endif
 
+#ifndef CUSTOM_OMP_FUNCTIONS
+	#define CUSTOM_OMP_FUNCTIONS
+	#if __has_include(<omp.h>)
+		#include <omp.h>
+__host__ __device__ static inline int get_max_threads() {
+		#ifdef __CUDA_ARCH__
+	return 1;
+		#else
+	return omp_get_max_threads();
+		#endif
+}
+__host__ __device__ static inline int get_thread_num() {
+		#ifdef __CUDA_ARCH__
+	return 0;
+		#else
+	return omp_get_thread_num();
+		#endif
+}
+	#else
+constexpr static inline int get_max_threads() { return 1; }
+constexpr static inline int get_thread_num() { return 0; }
+	#endif
+#endif
+
 template<class Derived>
 struct ManyBodySpaceTraits;
 // OpSpaceTraits should define the following properties:
@@ -114,13 +138,13 @@ __host__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
 
 	Eigen::ArrayX<bool> calculated = Eigen::ArrayX<bool>::Zero(this->dim());
 	m_transEqClass.resize(this->dim());
-	Eigen::ArrayXX<size_t> translated(this->sysSize(), omp_get_max_threads());
+	Eigen::ArrayXX<size_t> translated(this->sysSize(), get_max_threads());
 #pragma omp parallel for schedule(dynamic, 10)
 	for(size_t stateNum = 0; stateNum != this->dim(); ++stateNum) {
 		if(calculated(stateNum)) continue;
 		calculated(stateNum) = true;
 
-		auto const threadId        = omp_get_thread_num();
+		auto const threadId        = get_thread_num();
 		bool       duplicationFlag = false;
 		size_t     trans, eqClassRep = stateNum;
 		translated(0, threadId) = stateNum;
