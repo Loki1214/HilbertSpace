@@ -33,11 +33,11 @@ class BaseConverter {
 		__host__ __device__ BaseConverter(Integer radix = 0, Integer length = 0)
 		    : m_radix(radix), m_length(length), m_max(powi(radix, length)) {}
 
-		__host__ __device__                BaseConverter(BaseConverter const&) = default;
-		__host__ __device__ BaseConverter& operator=(BaseConverter const&)     = default;
-		__host__ __device__                BaseConverter(BaseConverter&&)      = default;
-		__host__ __device__ BaseConverter& operator=(BaseConverter&&)          = default;
-		__host__                           __device__ ~BaseConverter()         = default;
+		BaseConverter(BaseConverter const&)            = default;
+		BaseConverter& operator=(BaseConverter const&) = default;
+		BaseConverter(BaseConverter&&)                 = default;
+		BaseConverter& operator=(BaseConverter&&)      = default;
+		~BaseConverter()                               = default;
 
 		__host__ __device__ Integer radix() const { return this->m_radix; }
 		__host__ __device__ Integer length() const { return this->m_length; }

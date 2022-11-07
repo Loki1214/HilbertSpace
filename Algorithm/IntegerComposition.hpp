@@ -58,12 +58,12 @@ class IntegerComposition {
 		Eigen::ArrayXX<size_t> m_workB;
 
 	public:
-		__host__ __device__ IntegerComposition(size_t N = 0, size_t Length = 0, size_t Max = 0);
-		__host__ __device__ IntegerComposition(IntegerComposition const&)                = default;
-		__host__ __device__ IntegerComposition& operator=(IntegerComposition const&)     = default;
-		__host__ __device__                     IntegerComposition(IntegerComposition&&) = default;
-		__host__ __device__ IntegerComposition& operator=(IntegerComposition&&)          = default;
-		__host__                                __device__ ~IntegerComposition()         = default;
+		IntegerComposition(size_t N = 0, size_t Length = 0, size_t Max = 0);
+		IntegerComposition(IntegerComposition const&)            = default;
+		IntegerComposition& operator=(IntegerComposition const&) = default;
+		IntegerComposition(IntegerComposition&&)                 = default;
+		IntegerComposition& operator=(IntegerComposition&&)      = default;
+		~IntegerComposition()                                    = default;
 
 		__host__ __device__ size_t value() const { return m_N; };
 		__host__ __device__ size_t length() const { return m_Length; };

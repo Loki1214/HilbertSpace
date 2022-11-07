@@ -27,12 +27,12 @@ class OpSpaceBase {
 	public:
 		__host__ __device__ OpSpaceBase(BaseSpace const& baseSpace) : m_baseSpace{baseSpace} {};
 
-		__host__ __device__              OpSpaceBase()                   = default;
-		__host__ __device__              OpSpaceBase(OpSpaceBase const&) = default;
-		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase const&)   = default;
-		__host__ __device__              OpSpaceBase(OpSpaceBase&&)      = default;
-		__host__ __device__ OpSpaceBase& operator=(OpSpaceBase&&)        = default;
-		__host__                         __device__ ~OpSpaceBase()       = default;
+		OpSpaceBase()                              = default;
+		OpSpaceBase(OpSpaceBase const&)            = default;
+		OpSpaceBase& operator=(OpSpaceBase const&) = default;
+		OpSpaceBase(OpSpaceBase&&)                 = default;
+		OpSpaceBase& operator=(OpSpaceBase&&)      = default;
+		~OpSpaceBase()                             = default;
 
 		__host__ __device__ bool operator==(OpSpaceBase const& other) const {
 			return m_baseSpace == other.m_baseSpace;

@@ -39,12 +39,12 @@ class ManyBodyOpSpace : public ManyBodyOpSpaceBase< ManyBodyOpSpace<BaseSpace_, 
 		__host__ __device__ ManyBodyOpSpace(BaseSpace&& baseSpace)
 		    : Base(std::move(baseSpace), baseSpace.sysSize(), LocalSpace(baseSpace.locSpace())){};
 
-		__host__ __device__                  ManyBodyOpSpace()                       = default;
-		__host__ __device__                  ManyBodyOpSpace(ManyBodyOpSpace const&) = default;
-		__host__ __device__ ManyBodyOpSpace& operator=(ManyBodyOpSpace const&)       = default;
-		__host__ __device__                  ManyBodyOpSpace(ManyBodyOpSpace&&)      = default;
-		__host__ __device__ ManyBodyOpSpace& operator=(ManyBodyOpSpace&&)            = default;
-		__host__                             __device__ ~ManyBodyOpSpace()           = default;
+		ManyBodyOpSpace()                                  = default;
+		ManyBodyOpSpace(ManyBodyOpSpace const&)            = default;
+		ManyBodyOpSpace& operator=(ManyBodyOpSpace const&) = default;
+		ManyBodyOpSpace(ManyBodyOpSpace&&)                 = default;
+		ManyBodyOpSpace& operator=(ManyBodyOpSpace&&)      = default;
+		~ManyBodyOpSpace()                                 = default;
 
 	private:
 		/*! @name Implementation for methods of ancestor class HilbertSpace */

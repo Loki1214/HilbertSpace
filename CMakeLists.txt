@@ -13,7 +13,14 @@ if(NOT Catch2_FOUND)
 endif()
 enable_testing()
 
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.4 QUIET)
+if(NOT Eigen3_FOUND)
+	FetchContent_Declare(eigen3
+		GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+		GIT_TAG 3.4.0
+	)
+	FetchContent_MakeAvailable(eigen3)
+endif()
 find_package(OpenMP REQUIRED)
 
 set(modules
@@ -34,3 +41,26 @@ foreach(name IN LISTS modules)
 	)
 	add_test(${name}_test ${name}_test)
 endforeach(name)
+
+
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+  enable_language(CUDA)
+  if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 70)
+  endif()
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
+
+  set(name "HilbertSpace")
+  add_executable(${name}_onGPU_test ${name}_test.cu)
+	target_compile_options(${name}_onGPU_test PRIVATE -Wall -Wextra)
+	target_link_libraries(${name}_onGPU_test
+		Catch2::Catch2WithMain
+		Eigen3::Eigen
+		OpenMP::OpenMP_CXX
+	)
+	add_test(${name}_onGPU_test ${name}_onGPU_test)
+else()
+  message(STATUS "No CUDA support")
+endif()

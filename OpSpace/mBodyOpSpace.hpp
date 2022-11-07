@@ -50,12 +50,12 @@ class mBodyOpSpace<ManyBodySpinSpace, Scalar_>
 		      m_actingSites(m, baseSpace.sysSize(), 1),
 		      m_opConfig(baseSpace.dimLoc() * baseSpace.dimLoc() - 1, m) {}
 
-		__host__ __device__               mBodyOpSpace()                    = default;
-		__host__ __device__               mBodyOpSpace(mBodyOpSpace const&) = default;
-		__host__ __device__ mBodyOpSpace& operator=(mBodyOpSpace const&)    = default;
-		__host__ __device__               mBodyOpSpace(mBodyOpSpace&&)      = default;
-		__host__ __device__ mBodyOpSpace& operator=(mBodyOpSpace&&)         = default;
-		__host__                          __device__ ~mBodyOpSpace()        = default;
+		mBodyOpSpace()                               = default;
+		mBodyOpSpace(mBodyOpSpace const&)            = default;
+		mBodyOpSpace& operator=(mBodyOpSpace const&) = default;
+		mBodyOpSpace(mBodyOpSpace&&)                 = default;
+		mBodyOpSpace& operator=(mBodyOpSpace&&)      = default;
+		~mBodyOpSpace()                              = default;
 
 		__host__ __device__ size_t m() const { return m_mBody; }
 

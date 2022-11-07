@@ -24,11 +24,11 @@ class HilbertSpace<int> {
 		 */
 		__host__ __device__ HilbertSpace(size_t dim = 0) : m_dim{dim} {}
 
-		__host__ __device__               HilbertSpace(HilbertSpace const& other) = default;
-		__host__ __device__ HilbertSpace& operator=(HilbertSpace const& other)    = default;
-		__host__ __device__               HilbertSpace(HilbertSpace&& other)      = default;
-		__host__ __device__ HilbertSpace& operator=(HilbertSpace&& other)         = default;
-		__host__                          __device__ ~HilbertSpace()              = default;
+		HilbertSpace(HilbertSpace const& other)            = default;
+		HilbertSpace& operator=(HilbertSpace const& other) = default;
+		HilbertSpace(HilbertSpace&& other)                 = default;
+		HilbertSpace& operator=(HilbertSpace&& other)      = default;
+		~HilbertSpace()                                    = default;
 
 		/*! @name Operator overloads */
 		/* @{ */

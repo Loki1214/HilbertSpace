@@ -35,10 +35,10 @@ class ManyBodyOpSpaceBase : public OpSpaceBase<Derived>,
 		    : OpSpaceBase<Derived>(std::move(baseSpace)),
 		      ManyBodySpaceBase<Derived>(sysSize, std::move(locSpace)) {}
 
-		__host__ __device__ ManyBodyOpSpaceBase()                                      = default;
-		__host__ __device__ ManyBodyOpSpaceBase(ManyBodyOpSpaceBase const&)            = default;
-		__host__ __device__ ManyBodyOpSpaceBase& operator=(ManyBodyOpSpaceBase const&) = default;
-		__host__ __device__ ManyBodyOpSpaceBase(ManyBodyOpSpaceBase&&)                 = default;
-		__host__ __device__ ManyBodyOpSpaceBase& operator=(ManyBodyOpSpaceBase&&)      = default;
-		__host__                                 __device__ ~ManyBodyOpSpaceBase()     = default;
+		ManyBodyOpSpaceBase()                                      = default;
+		ManyBodyOpSpaceBase(ManyBodyOpSpaceBase const&)            = default;
+		ManyBodyOpSpaceBase& operator=(ManyBodyOpSpaceBase const&) = default;
+		ManyBodyOpSpaceBase(ManyBodyOpSpaceBase&&)                 = default;
+		ManyBodyOpSpaceBase& operator=(ManyBodyOpSpaceBase&&)      = default;
+		~ManyBodyOpSpaceBase()                                     = default;
 };

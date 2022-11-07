@@ -21,12 +21,12 @@ class SubSpace : public HilbertSpace< SubSpace<TotalSpace_, ScalarType_> > {
 		__host__ __device__ SubSpace(TotalSpace&& totalSpace)
 		    : m_totalSpace{std::move(totalSpace)}, m_basis(totalSpace.dim(), 0) {}
 
-		__host__ __device__           SubSpace()                       = default;
-		__host__ __device__           SubSpace(SubSpace const& other)  = default;
-		__host__ __device__ SubSpace& operator=(SubSpace const& other) = default;
-		__host__ __device__           SubSpace(SubSpace&& other)       = default;
-		__host__ __device__ SubSpace& operator=(SubSpace&& other)      = default;
-		__host__                      __device__ ~SubSpace()           = default;
+		SubSpace()                                 = default;
+		SubSpace(SubSpace const& other)            = default;
+		SubSpace& operator=(SubSpace const& other) = default;
+		SubSpace(SubSpace&& other)                 = default;
+		SubSpace& operator=(SubSpace&& other)      = default;
+		~SubSpace()                                = default;
 
 		__host__ __device__ TotalSpace const& totalSpace() const { return m_totalSpace; }
 		__host__ __device__ size_t            dimTot() const { return m_totalSpace.dim(); }
