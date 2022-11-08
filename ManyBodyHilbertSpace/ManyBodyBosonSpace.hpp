@@ -100,7 +100,11 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 			assert(stateNum < this->dim());
 			auto config = m_iComp.ordinal_to_config(stateNum);
 			for(Size l = 0; l != this->sysSize() / 2; ++l) {
-				std::swap(config(l), config(this->sysSize() - 1 - l));
+				// std::swap cannot be used in device code
+				// std::swap(config(l), config(this->sysSize() - 1 - l));
+				auto const temp = config(l);
+				config(l) = config(this->sysSize() - 1 - l);
+				config(this->sysSize() - 1 - l) = temp;
 			}
 			return m_iComp.config_to_ordinal(config);
 		}

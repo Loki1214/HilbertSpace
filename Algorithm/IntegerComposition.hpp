@@ -31,7 +31,7 @@ class IntegerComposition {
 		Eigen::ArrayXX<Size> m_workB;
 
 	public:
-		IntegerComposition(Size N = 0, Size Length = 0, Size Max = 0);
+		__host__ __device__ IntegerComposition(Size N = 0, Size Length = 0, Size Max = 0);
 		IntegerComposition(IntegerComposition const&)            = default;
 		IntegerComposition& operator=(IntegerComposition const&) = default;
 		IntegerComposition(IntegerComposition&&)                 = default;
@@ -61,7 +61,7 @@ class IntegerComposition {
 		__host__ __device__ Size translate(Size const ordinal, int trans, Array& work) const {
 			assert(ordinal < this->dim());
 			assert(0 <= trans && trans < this->length());
-			assert(static_cast<Size>(work.size()) >= this->length() + trans);
+			assert(work.size() >= this->length() + trans);
 			work.tail(this->length()) = this->ordinal_to_config(ordinal);
 			work.head(trans)          = work.tail(trans);
 			return this->config_to_ordinal(work);
@@ -73,16 +73,16 @@ class IntegerComposition {
 		}
 };
 
-inline IntegerComposition::IntegerComposition(Size N, Size Length, Size Max)
+inline __host__ __device__ IntegerComposition::IntegerComposition(Size N, Size Length, Size Max)
     : m_N{N},
       m_Length{Length},
       m_Max{Max < N ? Max : N},
       m_workA(N + 1, Length),
       m_workB(N + 1, Length) {
 	if(m_Max * m_Length < m_N) {
-		std::cerr << "Error at [" << __FILE__ << ":" << __LINE__ << "]\n\t" << __PRETTY_FUNCTION__
-		          << "\n\tMessage:\t m_Max(" << m_Max << ") * m_Length(" << m_Length
-		          << ") = " << m_Max * m_Length << " < m_N(" << m_N << ")" << std::endl;
+		printf("Error at [%s:%d]\n\t%s", __FILE__, __LINE__, __PRETTY_FUNCTION__);
+		printf("\n\tMessage:\t m_Max(%d) * m_Length(%d) = %d < m_N(%d)\n", int(m_Max),
+		       int(m_Length), int(m_Max * m_Length), int(m_N));
 		std::exit(EXIT_FAILURE);
 	}
 	if(m_Length <= 1) {

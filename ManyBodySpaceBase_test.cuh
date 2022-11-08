@@ -51,21 +51,19 @@ __device__ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const* mbSpace
 	// test for translation operations
 	mbSpace.compute_transEqClass();
 	printf("\tmbSpace.transEqDim() = %lu\n", static_cast<unsigned long>(mbSpace.transEqDim()));
-	// int* appeared = new int[mbSpace.dim()];
-	// for(Size j = 0; j != mbSpace.dim(); ++j) appeared[j] = 0;
+	Eigen::ArrayXi appeared = Eigen::ArrayXi::Zero(mbSpace.dim());
 
-	// grids = upperQuotient(mbSpace.transEqDim(), threads);
-	// check_transEqClass_kernel<<<grids, threads>>>(mbSpacePtr, appeared);
-	// cuCHECK(cudaGetLastError());
-	// cuCHECK(cudaDeviceSynchronize());
-	// for(Size stateNum = 0; stateNum != mbSpace.dim(); ++stateNum) assert(appeared[stateNum] == 1);
-	// delete[] appeared;
+	grids = upperQuotient(mbSpace.transEqDim(), threads);
+	check_transEqClass_kernel<<<grids, threads>>>(mbSpacePtr, appeared.data());
+	cuCHECK(cudaGetLastError());
+	cuCHECK(cudaDeviceSynchronize());
+	for(Size stateNum = 0; stateNum != mbSpace.dim(); ++stateNum) assert(appeared[stateNum] == 1);
 
-	// 		// test for state_to_transEqClass
-	// 		// test for state_to_transShift
+	// test for state_to_transEqClass
+	// test for state_to_transShift
 	// #pragma omp parallel for
 	// 	for(auto sample = 0; sample < index.size(); ++sample) {
-	// 		Size     stateNum   = index(sample);
+	// 		Size       stateNum   = index(sample);
 	// 		auto const eqClass    = mbSpace.state_to_transEqClass(stateNum);
 	// 		auto const eqClassRep = mbSpace.transEqClassRep(eqClass);
 	// 		auto const trans      = mbSpace.state_to_transShift(stateNum);
@@ -81,8 +79,8 @@ __device__ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const* mbSpace
 
 template<class Derived>
 __global__ void check_bijectiveness_kernel(ManyBodySpaceBase<Derived> const* mbSpacePtr) {
-	auto const&  mbSpace  = *mbSpacePtr;
-	Size const stateNum = blockIdx.x * blockDim.x + threadIdx.x;
+	auto const& mbSpace  = *mbSpacePtr;
+	Size const  stateNum = blockIdx.x * blockDim.x + threadIdx.x;
 	if(stateNum >= mbSpace.dim()) return;
 
 	auto config = mbSpace.ordinal_to_config(stateNum);
@@ -95,22 +93,22 @@ __global__ void check_bijectiveness_kernel(ManyBodySpaceBase<Derived> const* mbS
 template<class Derived>
 __global__ void check_transEqClass_kernel(ManyBodySpaceBase<Derived> const* mbSpacePtr,
                                           int*                              appeared) {
-	auto const&  mbSpace    = *mbSpacePtr;
-	Size const eqClassNum = blockIdx.x * blockDim.x + threadIdx.x;
+	auto const& mbSpace    = *mbSpacePtr;
+	Size const  eqClassNum = blockIdx.x * blockDim.x + threadIdx.x;
 	if(eqClassNum >= mbSpace.transEqDim()) return;
 
 	auto const stateNum = mbSpace.transEqClassRep(eqClassNum);
 	atomicAdd(&appeared[stateNum], 1);
 	for(auto trans = 1; trans != mbSpace.transPeriod(eqClassNum); ++trans) {
 		auto translated = mbSpace.translate(stateNum, trans);
-		atomicAdd(&appeared[stateNum], 1);
+		atomicAdd(&appeared[translated], 1);
 	}
 }
 
 template<class Derived>
 __global__ void check_reverseOp_kernel(ManyBodySpaceBase<Derived> const* mbSpacePtr) {
-	auto const&  mbSpace  = *mbSpacePtr;
-	Size const stateNum = blockIdx.x * blockDim.x + threadIdx.x;
+	auto const& mbSpace  = *mbSpacePtr;
+	Size const  stateNum = blockIdx.x * blockDim.x + threadIdx.x;
 	if(stateNum >= mbSpace.dim()) return;
 
 	auto config   = mbSpace.ordinal_to_config(stateNum);

@@ -143,7 +143,7 @@ class mBodyOpSpace<ManyBodySpinSpace, Scalar_>
 		__host__ __device__ Size translate_impl(Size opNum, int trans, Array& work) const {
 			assert(opNum < this->dim());
 			assert(0 <= trans && trans < this->sysSize());
-			assert(static_cast<Size>(work.size()) >= this->sysSize() + trans);
+			assert(work.size() >= this->sysSize() + trans);
 			work.tail(this->sysSize()) = this->ordinal_to_config(opNum);
 			work.head(trans)           = work.tail(trans);
 			return this->config_to_ordinal(work);
@@ -172,7 +172,7 @@ __host__ __device__ inline void mBodyOpSpace<ManyBodySpinSpace, Scalar_>::action
     Size& resStateNum, Scalar& coeff, Size opNum, Size stateNum, Array& work) const {
 	assert(opNum < this->dim());
 	assert(stateNum < this->baseDim());
-	assert(static_cast<Size>(work.size()) >= this->sysSize());
+	assert(work.size() >= this->sysSize());
 
 	auto const posConfNum = opNum / m_opConfig.max();
 	auto const opConfNum  = opNum % m_opConfig.max();

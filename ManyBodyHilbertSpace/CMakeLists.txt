@@ -16,14 +16,20 @@ foreach(name IN LISTS modules)
 endforeach(name)
 
 if(CMAKE_CUDA_COMPILER)
-  set(name "ManyBodySpinSpace")
-  add_executable(${name}_onGPU_test ${name}_test.cu)
-	target_compile_options(${name}_onGPU_test PRIVATE -Wall -Wextra)
-	target_link_libraries(${name}_onGPU_test
-		Catch2::Catch2WithMain
-		Eigen3::Eigen
-		OpenMP::OpenMP_CXX
-		CUDA::toolkit
+  set(modules
+		ManyBodySpinSpace
+		ManyBodyBosonSpace
+	#   TransSector
 	)
-	add_test(${name}_onGPU_test compute-sanitizer ${name}_onGPU_test)
+	foreach(name IN LISTS modules)
+		add_executable(${name}_onGPU_test ${name}_test.cu)
+		target_compile_options(${name}_onGPU_test PRIVATE -Wall -Wextra)
+		target_link_libraries(${name}_onGPU_test
+			Catch2::Catch2WithMain
+			Eigen3::Eigen
+			OpenMP::OpenMP_CXX
+			CUDA::toolkit
+		)
+		add_test(${name}_onGPU_test compute-sanitizer ${name}_onGPU_test)
+	endforeach(name)
 endif()
