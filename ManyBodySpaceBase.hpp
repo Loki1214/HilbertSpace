@@ -5,12 +5,6 @@
 #include <Eigen/Dense>
 #include <iostream>
 
-#ifdef __NVCC__
-	#include <thrust/sort.h>
-	#include <thrust/unique.h>
-// #include <thrust/execution_policy.h>
-#endif
-
 template<class Derived>
 struct ManyBodySpaceTraits;
 // OpSpaceTraits should define the following properties:
@@ -22,7 +16,7 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		using LocalSpace = typename ManyBodySpaceTraits<Derived>::LocalSpace;
 
 	private:
-		Size     m_sysSize = 0;
+		Size       m_sysSize = 0;
 		LocalSpace m_locSpace;
 
 	public:
@@ -42,9 +36,9 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		ManyBodySpaceBase& operator=(ManyBodySpaceBase&& other)      = default;
 		~ManyBodySpaceBase()                                         = default;
 
-		__host__ __device__ Size            sysSize() const { return m_sysSize; }
+		__host__ __device__ Size              sysSize() const { return m_sysSize; }
 		__host__ __device__ LocalSpace const& locSpace() const { return m_locSpace; }
-		__host__ __device__ Size            dimLoc() const { return m_locSpace.dim(); }
+		__host__ __device__ Size              dimLoc() const { return m_locSpace.dim(); }
 
 		// Statically polymorphic functions
 		__host__ __device__ Size locState(Size stateNum, int pos) const {
@@ -109,9 +103,12 @@ class ManyBodySpaceBase : public HilbertSpace<Derived> {
 		/* @} */
 };
 
-bool operator<(std::pair<Size, int>& lhs, std::pair<Size, int>& rhs) {
-	return lhs.first < rhs.first;
-}
+#ifdef __NVCC__
+	#include <cub/device/device_radix_sort.cuh>
+	#include <thrust/unique.h>
+	#include <thrust/execution_policy.h>
+	#include "ManyBodySpaceBase.cuh"
+#endif
 
 template<class Derived>
 __host__ __device__ void ManyBodySpaceBase<Derived>::compute_transEqClass() const {
@@ -130,7 +127,7 @@ __host__ __device__ void ManyBodySpaceBase<Derived>::compute_transEqClass() cons
 
 		auto const threadId        = get_thread_num();
 		bool       duplicationFlag = false;
-		Size     trans, eqClassRep = stateNum;
+		Size       trans, eqClassRep = stateNum;
 		translated(0, threadId) = stateNum;
 		for(trans = 1; trans != this->sysSize(); ++trans) {
 			auto const transed          = this->translate(stateNum, trans);
@@ -155,40 +152,66 @@ __host__ __device__ void ManyBodySpaceBase<Derived>::compute_transEqClass() cons
 	    = std::unique(m_transEqClass.begin(), m_transEqClass.end()) - m_transEqClass.begin();
 	m_transEqClass.conservativeResize(numEqClass);
 #else
-	Eigen::ArrayX<bool> calculated = Eigen::ArrayX<bool>::Zero(this->dim());
-	m_transEqClass.resize(this->dim());
-	Eigen::ArrayXX<Size> translated(this->sysSize(), get_max_threads());
-
-	for(Size stateNum = 0; stateNum < this->dim(); ++stateNum) {
-		if(calculated(stateNum)) continue;
-		calculated(stateNum) = true;
-
-		auto const threadId        = get_thread_num();
-		bool       duplicationFlag = false;
-		Size     trans, eqClassRep = stateNum;
-		translated(0, threadId) = stateNum;
-		for(trans = 1; trans != this->sysSize(); ++trans) {
-			auto const transed          = this->translate(stateNum, trans);
-			translated(trans, threadId) = transed;
-			if(transed == stateNum) break;
-			eqClassRep = (transed < eqClassRep ? transed : eqClassRep);
-			if(transed == eqClassRep && calculated(transed)) {
-				duplicationFlag = true;
-				break;
-			}
-			calculated(transed) = true;
-		}
-		if(duplicationFlag) continue;
-		auto const period = trans;
-		for(trans = 0; trans != period; ++trans) {
-			m_transEqClass(translated(trans, threadId)) = std::make_pair(eqClassRep, period);
-		}
+	Eigen::ArrayX<Size> transEqClassRep(this->dim());
+	Eigen::ArrayXi      transPeriod(this->dim());
+	{
+		Eigen::ArrayX<bool> calculated = Eigen::ArrayX<bool>::Zero(this->dim());
+		for(Size j = 0; j < this->dim(); ++j) calculated[j] = false;
+		constexpr void (*kernel)(ManyBodySpaceBase<Derived> const*, Size*, int*, bool*)
+		    = &compute_transEqClass_kernel;
+		struct cudaFuncAttributes attr;
+		cuCHECK(cudaFuncGetAttributes(&attr, kernel));
+		int const nThreads = min(48 * 1024 / static_cast<int>(this->sysSize() * sizeof(Size)),
+		                         attr.maxThreadsPerBlock);
+		int const nGrids   = (this->dim() / nThreads) + (this->dim() % nThreads == 0 ? 0 : 1);
+		int const smSize   = nThreads * (this->sysSize() * sizeof(Size));
+		printf("\tnGrids = %d, nThreads = %d, smSize = %d\n", nGrids, nThreads, smSize);
+		assert(nGrids * nThreads >= this->dim());
+		kernel<<<nGrids, nThreads, smSize>>>(this, transEqClassRep.data(), transPeriod.data(),
+		                                     calculated.data());
+		cuCHECK(cudaGetLastError());
+		cuCHECK(cudaDeviceSynchronize());
 	}
-	thrust::sort(thrust::seq, m_transEqClass.begin(), m_transEqClass.end());
-	Size const numEqClass
-	    = thrust::unique(thrust::seq, m_transEqClass.begin(), m_transEqClass.end())
-	      - m_transEqClass.begin();
-	m_transEqClass.conservativeResize(numEqClass);
+
+	Size numEqClass;
+	{
+		void*               d_temp_storage     = nullptr;
+		size_t              temp_storage_bytes = 0;
+		Eigen::ArrayX<Size> transEqClassRep_in(this->dim());
+		Eigen::ArrayXi      transPeriod_in(this->dim());
+		transEqClassRep_in.swap(transEqClassRep);
+		transPeriod_in.swap(transPeriod);
+		cub::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes,
+		                                transEqClassRep_in.data(), transEqClassRep.data(),
+		                                transPeriod_in.data(), transPeriod.data(), this->dim());
+		cuCHECK(cudaMalloc(&d_temp_storage, temp_storage_bytes));
+		cub::DeviceRadixSort::SortPairs(d_temp_storage, temp_storage_bytes,
+		                                transEqClassRep_in.data(), transEqClassRep.data(),
+		                                transPeriod_in.data(), transPeriod.data(), this->dim());
+
+		auto const [newEnd1, newEnd2]
+		    = thrust::unique_by_key(thrust::device, transEqClassRep.data(),
+		                            transEqClassRep.data() + this->dim(), transPeriod.data());
+		numEqClass = newEnd1 - transEqClassRep.data();
+		cuCHECK(cudaDeviceSynchronize());
+		cuCHECK(cudaGetLastError());
+		cuCHECK(cudaFree(d_temp_storage));
+	}
+
+	m_transEqClass.resize(numEqClass);
+	{
+		constexpr void (*kernel)(Eigen::ArrayX<std::pair<Size, int>>*, Size*, int*)
+		    = &make_paired_vector_kernel;
+		struct cudaFuncAttributes attr;
+		cuCHECK(cudaFuncGetAttributes(&attr, kernel));
+		int const nThreads = attr.maxThreadsPerBlock;
+		int const nGrids   = (numEqClass / nThreads) + (numEqClass % nThreads == 0 ? 0 : 1);
+		printf("\tnGrids = %d, nThreads = %d\n", nGrids, nThreads);
+		assert(nGrids * nThreads >= numEqClass);
+		kernel<<<nGrids, nThreads>>>(&m_transEqClass, transEqClassRep.data(), transPeriod.data());
+		cuCHECK(cudaGetLastError());
+		cuCHECK(cudaDeviceSynchronize());
+	}
 #endif
 	// 	m_stateToTransEqClass.resize(this->dim());
 	// #pragma omp parallel for schedule(dynamic, 10)

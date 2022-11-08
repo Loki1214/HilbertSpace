@@ -30,7 +30,7 @@ __global__ void test_ManyBodySpinSpace_kernel(Size dimLoc) {
 		ManyBodySpinSpace* mbSpacePtr  = new ManyBodySpinSpace(0, *locSpacePtr);
 		test_ManyBodySpaceBase(mbSpacePtr, 0, locSpacePtr);
 		delete mbSpacePtr;
-		for(Size sysSize = 1; sysSize <= 20; ++sysSize) {
+		for(Size sysSize = 1; sysSize <= 16; ++sysSize) {
 			ManyBodySpinSpace* mbSpacePtr = new ManyBodySpinSpace(sysSize, *locSpacePtr);
 			test_ManyBodySpaceBase(mbSpacePtr, sysSize, locSpacePtr);
 			delete mbSpacePtr;
