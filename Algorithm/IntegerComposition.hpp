@@ -1,11 +1,8 @@
 #pragma once
+
+#include "../typedefs.hpp"
 #include <Eigen/Dense>
 #include <iostream>
-
-#ifndef __NVCC__
-	#define __host__
-	#define __device__
-#endif
 
 #ifndef CUSTOM_OMP_FUNCTIONS
 	#define CUSTOM_OMP_FUNCTIONS
@@ -50,58 +47,57 @@ inline constexpr bool is_container_v = is_container<T>::value;
  */
 class IntegerComposition {
 	private:
-		size_t                 m_N      = 0;
-		size_t                 m_Length = 0;
-		size_t                 m_Max    = 0;
-		size_t                 m_dim    = 0;
-		Eigen::ArrayXX<size_t> m_workA;
-		Eigen::ArrayXX<size_t> m_workB;
+		Size                 m_N      = 0;
+		Size                 m_Length = 0;
+		Size                 m_Max    = 0;
+		Size                 m_dim    = 0;
+		Eigen::ArrayXX<Size> m_workA;
+		Eigen::ArrayXX<Size> m_workB;
 
 	public:
-		IntegerComposition(size_t N = 0, size_t Length = 0, size_t Max = 0);
+		IntegerComposition(Size N = 0, Size Length = 0, Size Max = 0);
 		IntegerComposition(IntegerComposition const&)            = default;
 		IntegerComposition& operator=(IntegerComposition const&) = default;
 		IntegerComposition(IntegerComposition&&)                 = default;
 		IntegerComposition& operator=(IntegerComposition&&)      = default;
 		~IntegerComposition()                                    = default;
 
-		__host__ __device__ size_t value() const { return m_N; };
-		__host__ __device__ size_t length() const { return m_Length; };
-		__host__ __device__ size_t max() const { return m_Max; };
-		__host__ __device__ size_t dim() const { return m_dim; };
+		__host__ __device__ Size value() const { return m_N; };
+		__host__ __device__ Size length() const { return m_Length; };
+		__host__ __device__ Size max() const { return m_Max; };
+		__host__ __device__ Size dim() const { return m_dim; };
 
 		template<class Array>
-		__host__ __device__ size_t config_to_ordinal(Array const& vec) const;
+		__host__ __device__ Size config_to_ordinal(Array const& vec) const;
 
 		template<class Array>
-		__host__ __device__ void ordinal_to_config(Array& vec, size_t const ordinal) const;
+		__host__ __device__ void ordinal_to_config(Array& vec, Size const ordinal) const;
 
-		__host__ __device__ Eigen::RowVectorX<size_t> ordinal_to_config(
-		    size_t const ordinal) const {
-			Eigen::RowVectorX<size_t> res(this->length());
+		__host__ __device__ Eigen::RowVectorX<Size> ordinal_to_config(Size const ordinal) const {
+			Eigen::RowVectorX<Size> res(this->length());
 			this->ordinal_to_config(res, ordinal);
 			return res;
 		}
 
-		__host__ __device__ size_t locNumber(size_t ordinal, int const pos) const;
+		__host__ __device__ Size locNumber(Size ordinal, int const pos) const;
 
 		template<class Array>
-		__host__ __device__ size_t translate(size_t const ordinal, int trans, Array& work) const {
+		__host__ __device__ Size translate(Size const ordinal, int trans, Array& work) const {
 			assert(ordinal < this->dim());
-			assert(0 <= trans && static_cast<size_t>(trans) < this->length());
-			assert(static_cast<size_t>(work.size()) >= this->length() + trans);
+			assert(0 <= trans && static_cast<Size>(trans) < this->length());
+			assert(static_cast<Size>(work.size()) >= this->length() + trans);
 			work.tail(this->length()) = this->ordinal_to_config(ordinal);
 			work.head(trans)          = work.tail(trans);
 			return this->config_to_ordinal(work);
 		}
 
-		__host__ __device__ size_t translate(size_t const ordinal, int trans) const {
-			Eigen::ArrayX<size_t> config(m_Length + trans);
+		__host__ __device__ Size translate(Size const ordinal, int trans) const {
+			Eigen::ArrayX<Size> config(m_Length + trans);
 			return this->translate(ordinal, trans, config);
 		}
 };
 
-inline IntegerComposition::IntegerComposition(size_t N, size_t Length, size_t Max)
+inline IntegerComposition::IntegerComposition(Size N, Size Length, Size Max)
     : m_N{N},
       m_Length{Length},
       m_Max{Max < N ? Max : N},
@@ -119,34 +115,32 @@ inline IntegerComposition::IntegerComposition(size_t N, size_t Length, size_t Ma
 	}
 
 	auto& Dims = m_workB;
-	for(size_t l = 0; l != m_Length; ++l) Dims(0, l) = 1;
-	for(size_t n = m_N; n != m_Max; --n) {
+	for(Size l = 0; l != m_Length; ++l) Dims(0, l) = 1;
+	for(Size n = m_N; n != m_Max; --n) {
 		Dims(n, 1)    = 0;
 		Dims(n, 0)    = 0;
 		m_workA(n, 0) = 0;
 	}
-	for(size_t n = 0; n != m_Max + 1; ++n) {
+	for(Size n = 0; n != m_Max + 1; ++n) {
 		Dims(n, 1)    = 1;
 		Dims(n, 0)    = 0;
 		m_workA(n, 0) = 0;
 	}
 	// Recursively calculate Dims(l,n) for remaining (l,n)
-	for(size_t l = 2; l != m_Length; ++l)
-		for(size_t n = 1; n <= m_N; ++n) {
+	for(Size l = 2; l != m_Length; ++l)
+		for(Size n = 1; n <= m_N; ++n) {
 			Dims(n, l) = 0;
-			for(size_t k = 0; k <= (m_Max < n ? m_Max : n); ++k) {
-				Dims(n, l) += Dims(n - k, l - 1);
-			}
+			for(Size k = 0; k <= (m_Max < n ? m_Max : n); ++k) { Dims(n, l) += Dims(n - k, l - 1); }
 		}
-	for(size_t l = 1; l != m_Length; ++l) {
+	for(Size l = 1; l != m_Length; ++l) {
 		m_workA(0, l) = Dims(m_N, m_Length - l);
-		for(size_t n = 1; n <= m_N; ++n)
+		for(Size n = 1; n <= m_N; ++n)
 			m_workA(n, l) = m_workA(n - 1, l) + Dims(m_N - n, m_Length - l);
 	}
 
-	for(size_t l = 0; l != m_Length; ++l) m_workB(0, l) = 0;
-	for(size_t n = 1; n <= N; ++n) {
-		for(size_t l = 1; l != m_Length - 1; ++l)
+	for(Size l = 0; l != m_Length; ++l) m_workB(0, l) = 0;
+	for(Size n = 1; n <= N; ++n) {
+		for(Size l = 1; l != m_Length - 1; ++l)
 			m_workB(n, l) = m_workA(n - 1, l) - m_workA(n - 1, l + 1);
 		m_workB(n, m_Length - 1) = m_workA(n - 1, m_Length - 1);
 	}
@@ -155,10 +149,10 @@ inline IntegerComposition::IntegerComposition(size_t N, size_t Length, size_t Ma
 }
 
 template<class Array>
-__host__ __device__ inline size_t IntegerComposition::config_to_ordinal(Array const& config) const {
-	assert(static_cast<size_t>(config.size()) >= m_Length);
-	size_t z = 0, res = 0;
-	for(size_t l = 1; l < m_Length; ++l) {
+__host__ __device__ inline Size IntegerComposition::config_to_ordinal(Array const& config) const {
+	assert(static_cast<Size>(config.size()) >= m_Length);
+	Size z = 0, res = 0;
+	for(Size l = 1; l < m_Length; ++l) {
 		z += config[m_Length - l];
 		res += m_workB(z, l);
 	}
@@ -166,12 +160,12 @@ __host__ __device__ inline size_t IntegerComposition::config_to_ordinal(Array co
 }
 
 template<class Array>
-__host__ __device__ inline void IntegerComposition::ordinal_to_config(Array&       config,
-                                                                      size_t const ordinal) const {
-	assert(static_cast<size_t>(config.size()) >= m_Length);
-	size_t ordinal_copy = ordinal;
-	size_t z = 0, zPrev = 0;
-	for(size_t l = 1; l != m_Length; ++l) {
+__host__ __device__ inline void IntegerComposition::ordinal_to_config(Array&     config,
+                                                                      Size const ordinal) const {
+	assert(static_cast<Size>(config.size()) >= m_Length);
+	Size ordinal_copy = ordinal;
+	Size z = 0, zPrev = 0;
+	for(Size l = 1; l != m_Length; ++l) {
 		while(m_workA(z, l) <= ordinal_copy) z += 1;
 		config[m_Length - l] = z - zPrev;
 		zPrev                = z;
@@ -180,11 +174,10 @@ __host__ __device__ inline void IntegerComposition::ordinal_to_config(Array&    
 	config[0] = m_N - z;
 }
 
-__host__ __device__ inline size_t IntegerComposition::locNumber(size_t    ordinal,
-                                                                int const pos) const {
-	assert(0 <= pos && static_cast<size_t>(pos) < this->length());
-	size_t z = 0, zPrev = 0;
-	for(size_t l = 1; l != m_Length - pos; ++l) {
+__host__ __device__ inline Size IntegerComposition::locNumber(Size ordinal, int const pos) const {
+	assert(0 <= pos && static_cast<Size>(pos) < this->length());
+	Size z = 0, zPrev = 0;
+	for(Size l = 1; l != m_Length - pos; ++l) {
 		while(m_workA(z, l) <= ordinal) z += 1;
 		zPrev = z;
 		ordinal -= m_workB(z, l);

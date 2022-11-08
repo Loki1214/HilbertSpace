@@ -9,20 +9,20 @@ template<class Derived>
 void test_OpSpace(OpSpaceBase<Derived>& opSpace) {
 	std::cout << "opSpace.dim() = " << opSpace.dim() << std::endl;
 	constexpr double precision    = 1.0e-12;
-	auto const       innerProduct = [&](size_t j, size_t k) {
+	auto const       innerProduct = [&](Size j, Size k) {
         return (opSpace.basisOp(j).adjoint() * opSpace.basisOp(k)).eval().diagonal().sum();
 	};
 
-	constexpr size_t                      nSample = 100;
+	constexpr Size                      nSample = 100;
 	std::random_device                    seed_gen;
 	std::default_random_engine            engine(seed_gen());
-	std::uniform_int_distribution<size_t> dist(0, opSpace.dim() - 1);
-	Eigen::ArrayX<size_t>                 index;
+	std::uniform_int_distribution<Size> dist(0, opSpace.dim() - 1);
+	Eigen::ArrayX<Size>                 index;
 	if(nSample > opSpace.dim() * (opSpace.dim() + 1)) {
 		index.resize(opSpace.dim() * (opSpace.dim() + 1));
-		size_t id = 0;
-		for(size_t j = 0; j != opSpace.dim(); ++j)
-			for(size_t k = j; k != opSpace.dim(); ++k) {
+		Size id = 0;
+		for(Size j = 0; j != opSpace.dim(); ++j)
+			for(Size k = j; k != opSpace.dim(); ++k) {
 				index(id++) = j;
 				index(id++) = k;
 			}

@@ -1,12 +1,6 @@
 #pragma once
 
-#ifndef __NVCC__
-	#define __host__
-	#define __device__
-#endif
-
-#include <cstddef>
-using std::size_t;
+#include "typedefs.hpp"
 
 template<class Derived>
 class HilbertSpace;
@@ -14,7 +8,7 @@ class HilbertSpace;
 template<>
 class HilbertSpace<int> {
 	private:
-		size_t m_dim;
+		Size m_dim;
 
 	public:
 		/**
@@ -22,7 +16,7 @@ class HilbertSpace<int> {
 		 *
 		 * @param dim Dimension of the Hilbert space
 		 */
-		__host__ __device__ HilbertSpace(size_t dim = 0) : m_dim{dim} {}
+		__host__ __device__ HilbertSpace(Size dim = 0) : m_dim{dim} {}
 
 		HilbertSpace(HilbertSpace const& other)            = default;
 		HilbertSpace& operator=(HilbertSpace const& other) = default;
@@ -37,13 +31,13 @@ class HilbertSpace<int> {
 		}
 		/* @} */
 
-		__host__ __device__ size_t dim() const { return m_dim; };
+		__host__ __device__ Size dim() const { return m_dim; };
 };
 
 template<class Derived>
 class HilbertSpace {
 	public:
-		__host__ __device__ size_t dim() const {
+		__host__ __device__ Size dim() const {
 			return static_cast<Derived const*>(this)->dim_impl();
 		};
 

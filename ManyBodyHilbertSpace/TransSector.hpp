@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../typedefs.hpp"
 #include "../ManyBodySpaceBase.hpp"
 #include "../SubSpace.hpp"
 
@@ -40,24 +42,24 @@ class TransSector : public SubSpace<TotalSpace_, Scalar> {
 		    : SubSpace<TotalSpace, Scalar>{mbHSpace}, m_momentum(k) {
 			using Real         = typename Eigen::NumTraits<Scalar>::Real;
 			constexpr Scalar I = Scalar(0, 1);
-			size_t const     L = this->totalSpace().sysSize();
+			Size const       L = this->totalSpace().sysSize();
 
 			if(L == 0) return;
-			auto isCompatible = [&](size_t eqClass) {
+			auto isCompatible = [&](Size eqClass) {
 				return (this->totalSpace().transPeriod(eqClass) * k) % L == 0;
 			};
 
 			this->totalSpace().compute_transEqClass();
-			size_t dim = 0;
-			for(size_t eqClass = 0; eqClass < this->totalSpace().transEqDim(); ++eqClass) {
+			Size dim = 0;
+			for(Size eqClass = 0; eqClass < this->totalSpace().transEqDim(); ++eqClass) {
 				if(!isCompatible(eqClass)) continue;
 				dim += 1;
 			}
 
 			this->basis().resize(this->totalSpace().dim(), dim);
 			this->basis().reserve(Eigen::VectorXi::Constant(dim, L));
-			size_t basisNum = 0, numNonZeros = 0;
-			for(size_t eqClass = 0; eqClass < this->totalSpace().transEqDim(); ++eqClass) {
+			Size basisNum = 0, numNonZeros = 0;
+			for(Size eqClass = 0; eqClass < this->totalSpace().transEqDim(); ++eqClass) {
 				if(!isCompatible(eqClass)) continue;
 				Real const norm = Real(sqrt(Real(this->totalSpace().transPeriod(eqClass))));
 

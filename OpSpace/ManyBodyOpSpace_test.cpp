@@ -11,8 +11,8 @@
 using Scalar = std::complex<double>;
 
 TEST_CASE("ManyBodyOpSpace", "test") {
-	size_t const      LMax = 14;
-	size_t const      dLoc = 2;
+	Size const        LMax = 14;
+	Size const        dLoc = 2;
 	HilbertSpace<int> locSpace(dLoc);
 
 	// test for class ManyBodySpinSpace
@@ -29,7 +29,7 @@ TEST_CASE("ManyBodyOpSpace", "test") {
 		ManyBodyOpSpace<decltype(mbSpace), Scalar> opSpace(mbSpace);
 		test_ManyBodySpaceBase(opSpace, 0, OpSpace<Scalar>(locSpace));
 		test_OpSpace(opSpace);
-		for(size_t sysSize = LMax; sysSize <= LMax; ++sysSize) {
+		for(Size sysSize = LMax; sysSize <= LMax; ++sysSize) {
 			std::cout << "sysSize = " << sysSize << std::endl;
 			ManyBodySpinSpace                          mbSpace(sysSize, locSpace);
 			ManyBodyOpSpace<decltype(mbSpace), Scalar> opSpace(mbSpace);

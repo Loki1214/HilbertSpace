@@ -20,7 +20,7 @@ double levelSpacingsRatio(Array const& eigVals) {
 }
 
 TEST_CASE("RandomMatrixEnsemble", "test") {
-	constexpr size_t  dim = 400;
+	constexpr Size    dim = 400;
 	HilbertSpace<int> hSpace(dim);
 	OpSpace<Scalar>   opSpace(hSpace);
 

@@ -4,7 +4,7 @@
 #include <iostream>
 
 TEST_CASE("ManyBodySpinSpace", "test") {
-	size_t            dLoc = 2;
+	Size              dLoc = 2;
 	HilbertSpace<int> locSpace(dLoc);
 
 	// test for class ManyBodySpinSpace
@@ -17,7 +17,7 @@ TEST_CASE("ManyBodySpinSpace", "test") {
 		// test Constructor1
 		ManyBodySpinSpace mbSpace(0, locSpace);
 		test_ManyBodySpaceBase(mbSpace, 0, locSpace);
-		for(size_t sysSize = 1; sysSize <= 20; ++sysSize) {
+		for(Size sysSize = 1; sysSize <= 20; ++sysSize) {
 			ManyBodySpinSpace mbSpace(sysSize, locSpace);
 			test_ManyBodySpaceBase(mbSpace, sysSize, locSpace);
 		}

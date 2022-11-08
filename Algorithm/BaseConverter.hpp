@@ -1,12 +1,8 @@
 #pragma once
 
+#include "../typedefs.hpp"
 #include <Eigen/Dense>
 #include <limits>
-
-#ifndef __NVCC__
-	#define __host__
-	#define __device__
-#endif
 
 template<typename Integer_,
          typename std::enable_if_t< std::numeric_limits<Integer_>::is_integer >* = nullptr >

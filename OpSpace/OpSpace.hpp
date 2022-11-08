@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../typedefs.hpp"
 #include "../OpSpaceBase.hpp"
 #include "../HilbertSpace.hpp"
 #include <Eigen/Core>
@@ -25,21 +27,21 @@ class OpSpace : public OpSpaceBase< OpSpace<Scalar_> > {
 
 	private:
 		friend OpSpaceBase< OpSpace >;
-		__host__ __device__ size_t dim_impl() const {
+		__host__ __device__ Size dim_impl() const {
 			if constexpr(std::is_same_v<Scalar, RealScalar>) {
 				return (this->baseDim() * (this->baseDim() + 1)) / 2;
 			}
 			else { return this->baseDim() * this->baseDim(); }
 		}
 
-		__host__ __device__ void action_impl(size_t& resStateNum, Scalar& coeff, size_t opNum,
-		                                     size_t basisNum) const {
+		__host__ __device__ void action_impl(Size& resStateNum, Scalar& coeff, Size opNum,
+		                                     Size basisNum) const {
 			assert(opNum < this->dim());
 			assert(basisNum < this->baseDim());
 
 			resStateNum = basisNum;
 			coeff       = 0.0;
-			size_t Digit1, Digit2;
+			Size Digit1, Digit2;
 
 			if(opNum < this->baseDim()) {
 				// Variant of sigma Z
@@ -92,7 +94,7 @@ class OpSpace : public OpSpaceBase< OpSpace<Scalar_> > {
 			return;
 		}
 
-		__host__ __device__ RealScalar opHSNormSq_impl(size_t opNum) const {
+		__host__ __device__ RealScalar opHSNormSq_impl(Size opNum) const {
 			assert(opNum < this->dim());
 			if(opNum < this->baseDim())
 				return this->baseDim();

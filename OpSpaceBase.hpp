@@ -1,12 +1,8 @@
 #pragma once
 
+#include "typedefs.hpp"
 #include <Eigen/Core>
 #include <Eigen/Sparse>
-
-#ifndef __NVCC__
-	#define __host__
-	#define __device__
-#endif
 
 template<class Derived>
 struct OpSpaceTraits;
@@ -39,45 +35,45 @@ class OpSpaceBase {
 		}
 
 		__host__ __device__ BaseSpace const& baseSpace() const { return m_baseSpace; }
-		__host__ __device__ size_t           baseDim() const { return m_baseSpace.dim(); }
+		__host__ __device__ Size           baseDim() const { return m_baseSpace.dim(); }
 
-		__host__ __device__ std::pair<size_t, Scalar> action(size_t opNum, size_t basisNum) const {
-			size_t resStateNum;
+		__host__ __device__ std::pair<Size, Scalar> action(Size opNum, Size basisNum) const {
+			Size resStateNum;
 			Scalar coeff;
 			this->action(resStateNum, coeff, opNum, basisNum);
 			return std::make_pair(resStateNum, coeff);
 		}
 
-		__host__ void basisOp(Eigen::SparseMatrix<Scalar>& res, size_t opNum) const {
+		__host__ void basisOp(Eigen::SparseMatrix<Scalar>& res, Size opNum) const {
 			res.resize(this->baseDim(), this->baseDim());
 			res.reserve(Eigen::VectorXi::Constant(this->baseDim(), 1));
 #pragma omp parallel for
-			for(size_t basisNum = 0; basisNum < this->baseDim(); ++basisNum) {
+			for(Size basisNum = 0; basisNum < this->baseDim(); ++basisNum) {
 				auto [resStateNum, coeff]           = this->action(opNum, basisNum);
 				res.coeffRef(resStateNum, basisNum) = coeff;
 			}
 			res.makeCompressed();
 		}
 
-		__host__ Eigen::SparseMatrix<Scalar> basisOp(size_t opNum) const {
+		__host__ Eigen::SparseMatrix<Scalar> basisOp(Size opNum) const {
 			Eigen::SparseMatrix<Scalar> res;
 			this->basisOp(res, opNum);
 			return res;
 		}
 
 		// statically polymorphic functions
-		__host__ __device__ size_t dim() const {
+		__host__ __device__ Size dim() const {
 			return static_cast<Derived const*>(this)->dim_impl();
 		}
 
 		template<class... Args>
-		__host__ __device__ void action(size_t& resStateNum, Scalar& coeff, size_t opNum,
-		                                size_t basisNum, Args&&... args) const {
+		__host__ __device__ void action(Size& resStateNum, Scalar& coeff, Size opNum,
+		                                Size basisNum, Args&&... args) const {
 			static_cast<Derived const*>(this)->action_impl(resStateNum, coeff, opNum, basisNum,
 			                                               args...);
 		}
 
-		__host__ __device__ RealScalar opHSNormSq(size_t opNum) const {
+		__host__ __device__ RealScalar opHSNormSq(Size opNum) const {
 			return static_cast<Derived const*>(this)->opHSNormSq_impl(opNum);
 		}
 };

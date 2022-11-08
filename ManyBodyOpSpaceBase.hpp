@@ -1,12 +1,8 @@
 #pragma once
 
+#include "typedefs.hpp"
 #include "ManyBodySpaceBase.hpp"
 #include "OpSpaceBase.hpp"
-
-#ifndef __NVCC__
-	#define __host__
-	#define __device__
-#endif
 
 template<class Derived>
 class ManyBodyOpSpaceBase : public OpSpaceBase<Derived>,
@@ -27,10 +23,10 @@ class ManyBodyOpSpaceBase : public OpSpaceBase<Derived>,
 		 * @param sysSize
 		 * @param locSpace
 		 */
-		__host__ __device__ ManyBodyOpSpaceBase(BaseSpace const& baseSpace, size_t sysSize,
+		__host__ __device__ ManyBodyOpSpaceBase(BaseSpace const& baseSpace, Size sysSize,
 		                                        LocalSpace const& locSpace)
 		    : OpSpaceBase<Derived>(baseSpace), ManyBodySpaceBase<Derived>(sysSize, locSpace) {}
-		__host__ __device__ ManyBodyOpSpaceBase(BaseSpace&& baseSpace, size_t sysSize,
+		__host__ __device__ ManyBodyOpSpaceBase(BaseSpace&& baseSpace, Size sysSize,
 		                                        LocalSpace&& locSpace)
 		    : OpSpaceBase<Derived>(std::move(baseSpace)),
 		      ManyBodySpaceBase<Derived>(sysSize, std::move(locSpace)) {}

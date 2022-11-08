@@ -3,29 +3,28 @@
 #include <Eigen/Dense>
 #include <iostream>
 
-void test_IntegerComposition(IntegerComposition& iComp, size_t N, size_t L, size_t Max,
-                             size_t dim) {
+void test_IntegerComposition(IntegerComposition& iComp, Size N, Size L, Size Max, Size dim) {
 	REQUIRE(iComp.value() == N);
 	REQUIRE(iComp.length() == L);
 	REQUIRE(iComp.max() == Max);
 	REQUIRE(iComp.dim() == dim);
 	// #pragma omp parallel for
-	for(size_t ordinal = 0; ordinal < iComp.dim(); ++ordinal) {
+	for(Size ordinal = 0; ordinal < iComp.dim(); ++ordinal) {
 		auto config = iComp.ordinal_to_config(ordinal);
-		REQUIRE(iComp.value() == static_cast<size_t>(config.sum()));
-		REQUIRE(iComp.max() >= static_cast<size_t>(config.maxCoeff()));
+		REQUIRE(iComp.value() == static_cast<Size>(config.sum()));
+		REQUIRE(iComp.max() >= static_cast<Size>(config.maxCoeff()));
 		REQUIRE(iComp.config_to_ordinal(config) == ordinal);
-		for(size_t pos = 0; pos != iComp.length(); ++pos) {
+		for(Size pos = 0; pos != iComp.length(); ++pos) {
 			REQUIRE(iComp.locNumber(ordinal, pos) == config(pos));
 		}
 	}
 }
 
 TEST_CASE("IntegerComposition", "test") {
-	int                    NMax  = 4;
-	int                    LMax  = 4;
-	Eigen::ArrayXX<size_t> binom = Eigen::ArrayXX<size_t>::Zero(NMax + LMax + 1, NMax + LMax + 1);
-	binom(0, 0)                  = 1;
+	int                  NMax  = 4;
+	int                  LMax  = 4;
+	Eigen::ArrayXX<Size> binom = Eigen::ArrayXX<Size>::Zero(NMax + LMax + 1, NMax + LMax + 1);
+	binom(0, 0)                = 1;
 	for(auto j = 1; j < binom.rows(); ++j) {
 		binom(j, 0) = 1;
 		for(auto m = 1; m <= j; ++m) binom(j, m) = binom(j - 1, m - 1) + binom(j - 1, m);

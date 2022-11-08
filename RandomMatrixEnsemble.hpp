@@ -1,12 +1,8 @@
 #pragma once
 
+#include "typedefs.hpp"
 #include <Eigen/Dense>
 #include <random>
-
-#ifndef __NVCC__
-	#define __host__
-	#define __device__
-#endif
 
 template<class OpSpace_, class Distribution_, class Generator_>
 class RandomMatrixEnsemble {
@@ -15,7 +11,7 @@ class RandomMatrixEnsemble {
 		OpSpace_      m_opSpace;
 		Distribution_ m_dist;
 		Generator_    m_engine;
-		size_t        m_count = 0;
+		Size          m_count = 0;
 
 	public:
 		/**
@@ -39,8 +35,8 @@ class RandomMatrixEnsemble {
 			m_engine = Generator_(seed);
 			m_count  = 0;
 		}
-		void discard(size_t num) {
-			for(size_t j = 0; j != num * m_opSpace.dim(); ++j) m_dist(m_engine);
+		void discard(Size num) {
+			for(Size j = 0; j != num * m_opSpace.dim(); ++j) m_dist(m_engine);
 			m_count += num * m_opSpace.dim();
 		}
 
@@ -52,7 +48,7 @@ class RandomMatrixEnsemble {
 			    = Eigen::MatrixX<Scalar>::Zero(m_opSpace.baseDim(), m_opSpace.baseDim());
 #pragma omp declare reduction(+ : Eigen::MatrixX<Scalar> : omp_out=omp_out+omp_in) initializer(omp_priv = omp_orig)
 #pragma omp parallel for reduction(+ : res)
-			for(size_t p = 0; p < m_opSpace.dim(); ++p) { res += coeff(p) * m_opSpace.basisOp(p); }
+			for(Size p = 0; p < m_opSpace.dim(); ++p) { res += coeff(p) * m_opSpace.basisOp(p); }
 			m_count += m_opSpace.dim();
 			return res;
 		}

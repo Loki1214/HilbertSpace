@@ -13,15 +13,45 @@ if(NOT Catch2_FOUND)
 endif()
 enable_testing()
 
-find_package(Eigen3 3.4 QUIET)
-if(NOT Eigen3_FOUND)
-	FetchContent_Declare(eigen3
-		GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-		GIT_TAG 3.4.0
-	)
-	FetchContent_MakeAvailable(eigen3)
-endif()
+# find_package(Eigen3 3.4 QUIET)
+# if(NOT Eigen3_FOUND)
+# 	FetchContent_Declare(eigen3
+# 		GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+# 		GIT_TAG 3.4.0
+# 	)
+# 	FetchContent_MakeAvailable(eigen3)
+# endif()
+# Include customized eigen
+add_library(Eigen3::Eigen INTERFACE IMPORTED)
+set_target_properties(Eigen3::Eigen PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/eigen"
+)
+include_directories(SYSTEM eigen)
+#
 find_package(OpenMP REQUIRED)
+
+
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+  enable_language(CUDA)
+  if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 70)
+  endif()
+  set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
+#   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --relocatable-device-code=true")
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcudafe --diag_suppress=esa_on_defaulted_function_ignored")
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo -Xcompiler -rdynamic")
+  if(OpenMP_FOUND)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -fopenmp")
+  endif()
+
+  find_package(CUDAToolkit REQUIRED)
+else()
+  message(STATUS "No CUDA support")
+endif()
+
 
 set(modules
 	HilbertSpace
@@ -43,15 +73,8 @@ foreach(name IN LISTS modules)
 endforeach(name)
 
 
-include(CheckLanguage)
-check_language(CUDA)
-if(CMAKE_CUDA_COMPILER)
-  enable_language(CUDA)
-  if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-    set(CMAKE_CUDA_ARCHITECTURES 70)
-  endif()
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
 
+if(CMAKE_CUDA_COMPILER)
   set(name "HilbertSpace")
   add_executable(${name}_onGPU_test ${name}_test.cu)
 	target_compile_options(${name}_onGPU_test PRIVATE -Wall -Wextra)
@@ -61,6 +84,4 @@ if(CMAKE_CUDA_COMPILER)
 		OpenMP::OpenMP_CXX
 	)
 	add_test(${name}_onGPU_test ${name}_onGPU_test)
-else()
-  message(STATUS "No CUDA support")
 endif()

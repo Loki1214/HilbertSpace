@@ -15,19 +15,19 @@ TEST_CASE("OpSpace", "test") {
 	constexpr Scalar I = Scalar(0, 1);
 
 	{
-		for(size_t dim = 2; dim < 64; dim *= 2) {
+		for(Size dim = 2; dim < 64; dim *= 2) {
 			std::cout << "dim = " << dim << std::endl;
-			HilbertSpace<int>     baseSpace(dim);
-			OpSpace<Scalar> opSpace(baseSpace);
+			HilbertSpace<int> baseSpace(dim);
+			OpSpace<Scalar>   opSpace(baseSpace);
 			test_OpSpace(opSpace);
 			for(int rep = 0; rep != 100; ++rep)
 				REQUIRE(Matrix(opSpace.basisOp(0)) == Eigen::MatrixX<Scalar>::Identity(dim, dim));
 		}
 	}
 	{
-		size_t                dim = 3;
-		HilbertSpace<int>     baseSpace(dim);
-		OpSpace<Scalar> opSpace(baseSpace);
+		Size              dim = 3;
+		HilbertSpace<int> baseSpace(dim);
+		OpSpace<Scalar>   opSpace(baseSpace);
 		test_OpSpace(opSpace);
 
 		for(int rep = 0; rep != 100; ++rep)

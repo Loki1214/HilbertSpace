@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../typedefs.hpp"
 #include "../ManyBodySpaceBase.hpp"
 #include "../Algorithm/IntegerComposition.hpp"
 
@@ -26,7 +28,7 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		 * @param max
 		 * @param locSpace
 		 */
-		__host__ __device__ ManyBodyBosonSpace(size_t sysSize, size_t max,
+		__host__ __device__ ManyBodyBosonSpace(Size sysSize, Size max,
 		                                       LocalSpace const& locSpace)
 		    : Base(sysSize, locSpace),
 		      m_iComp{(locSpace.dim() == 0 ? 0 : locSpace.dim() - 1), sysSize, max} {}
@@ -37,7 +39,7 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		 * @param sysSize
 		 * @param locSpace
 		 */
-		__host__ __device__ ManyBodyBosonSpace(size_t sysSize, LocalSpace const& locSpace)
+		__host__ __device__ ManyBodyBosonSpace(Size sysSize, LocalSpace const& locSpace)
 		    : ManyBodyBosonSpace(sysSize, locSpace.dim(), locSpace) {}
 
 		/**
@@ -46,7 +48,7 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		 * @param sysSize
 		 * @param locSpace
 		 */
-		__host__ __device__ ManyBodyBosonSpace(size_t sysSize, size_t nBosons, size_t max)
+		__host__ __device__ ManyBodyBosonSpace(Size sysSize, Size nBosons, Size max)
 		    : ManyBodyBosonSpace(sysSize, max, LocalSpace(nBosons + 1)) {}
 
 		/**
@@ -55,49 +57,49 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		 * @param sysSize
 		 * @param nBosons
 		 */
-		__host__ __device__ ManyBodyBosonSpace(size_t sysSize = 0, size_t nBosons = 0)
+		__host__ __device__ ManyBodyBosonSpace(Size sysSize = 0, Size nBosons = 0)
 		    : ManyBodyBosonSpace(sysSize, LocalSpace(sysSize == 0 ? 0 : nBosons + 1)) {}
 
 	private:
 		/*! @name Implementation for methods of ancestor class HilbertSpace */
 		/* @{ */
 		friend HilbertSpace<ManyBodyBosonSpace>;
-		__host__ __device__ size_t dim_impl() const { return m_iComp.dim(); }
+		__host__ __device__ Size dim_impl() const { return m_iComp.dim(); }
 		/* @} */
 
 		/*! @name Implementation for methods of parent class ManyBodySpaceBase */
 		/* @{ */
 		friend ManyBodySpaceBase<ManyBodyBosonSpace>;
-		__host__ __device__ size_t locState_impl(size_t stateNum, int pos) const {
+		__host__ __device__ Size locState_impl(Size stateNum, int pos) const {
 			assert(stateNum < this->dim());
-			assert(0 <= pos && static_cast<size_t>(pos) < this->sysSize());
+			assert(0 <= pos && static_cast<Size>(pos) < this->sysSize());
 			return m_iComp.locNumber(stateNum, pos);
 		}
 
-		__host__ __device__ Eigen::RowVectorX<size_t> ordinal_to_config_impl(
-		    size_t stateNum) const {
+		__host__ __device__ Eigen::RowVectorX<Size> ordinal_to_config_impl(
+		    Size stateNum) const {
 			assert(stateNum < this->dim());
 			return m_iComp.ordinal_to_config(stateNum);
 		}
 
 		template<class Array>
-		__host__ __device__ size_t config_to_ordinal_impl(Array const& config) const {
-			assert(static_cast<size_t>(config.size()) >= this->sysSize());
+		__host__ __device__ Size config_to_ordinal_impl(Array const& config) const {
+			assert(static_cast<Size>(config.size()) >= this->sysSize());
 			return m_iComp.config_to_ordinal(config);
 		}
 
 		template<typename... Args>
-		__host__ __device__ size_t translate_impl(size_t stateNum, int trans,
+		__host__ __device__ Size translate_impl(Size stateNum, int trans,
 		                                          Args&&... args) const {
 			assert(stateNum < this->dim());
-			assert(0 <= trans && static_cast<size_t>(trans) < this->sysSize());
+			assert(0 <= trans && static_cast<Size>(trans) < this->sysSize());
 			return m_iComp.translate(stateNum, trans, std::forward<Args>(args)...);
 		}
 
-		__host__ __device__ size_t reverse_impl(size_t stateNum) const {
+		__host__ __device__ Size reverse_impl(Size stateNum) const {
 			assert(stateNum < this->dim());
 			auto config = m_iComp.ordinal_to_config(stateNum);
-			for(size_t l = 0; l != this->sysSize() / 2; ++l) {
+			for(Size l = 0; l != this->sysSize() / 2; ++l) {
 				std::swap(config(l), config(this->sysSize() - 1 - l));
 			}
 			return m_iComp.config_to_ordinal(config);

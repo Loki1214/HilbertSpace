@@ -1,4 +1,6 @@
 #pragma once
+
+#include "typedefs.hpp"
 #include "HilbertSpace.hpp"
 #include <Eigen/Core>
 #include <Eigen/Sparse>
@@ -29,7 +31,7 @@ class SubSpace : public HilbertSpace< SubSpace<TotalSpace_, ScalarType_> > {
 		~SubSpace()                                = default;
 
 		__host__ __device__ TotalSpace const& totalSpace() const { return m_totalSpace; }
-		__host__ __device__ size_t            dimTot() const { return m_totalSpace.dim(); }
+		__host__ __device__ Size              dimTot() const { return m_totalSpace.dim(); }
 
 		__host__ __device__ SparseMatrix&       basis() { return m_basis; }
 		__host__ __device__ SparseMatrix const& basis() const { return m_basis; }

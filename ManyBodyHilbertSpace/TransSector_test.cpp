@@ -10,9 +10,9 @@ using Scalar = std::complex<double>;
 
 TEST_CASE("TransSector", "test") {
 	int const         k    = 0;
-	size_t const      NMax = 6;
-	size_t const      LMax = 16;
-	size_t const      dLoc = 2;
+	Size const        NMax = 6;
+	Size const        LMax = 16;
+	Size const        dLoc = 2;
 	HilbertSpace<int> locSpace(dLoc);
 
 	// test for class ManyBodySpinSpace
@@ -31,7 +31,7 @@ TEST_CASE("TransSector", "test") {
 		TransSector<decltype(mbSpace), Scalar> transSector(k, mbSpace);
 		test_SubSpace(transSector);
 
-		for(size_t sysSize = 1; sysSize <= LMax; ++sysSize) {
+		for(Size sysSize = 1; sysSize <= LMax; ++sysSize) {
 			ManyBodySpinSpace                      mbSpace(sysSize, locSpace);
 			TransSector<decltype(mbSpace), Scalar> transSector(k, mbSpace);
 			test_SubSpace(transSector);
@@ -40,8 +40,8 @@ TEST_CASE("TransSector", "test") {
 
 	{
 		// test Constructor1
-		for(size_t N = 1; N <= NMax; ++N)
-			for(size_t L = N; L <= LMax; ++L) {
+		for(Size N = 1; N <= NMax; ++N)
+			for(Size L = N; L <= LMax; ++L) {
 				HilbertSpace<int> locSpace(N + 1);
 				{
 					ManyBodyBosonSpace                     mbSpace(L, N, locSpace);

@@ -5,7 +5,7 @@
 #include <random>
 
 template<class Derived, class LocalSpace>
-void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sysSize,
+void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, Size sysSize,
                             LocalSpace const& locSpace) {
 	std::cout << "mbSpace.dim() = " << mbSpace.dim() << std::endl;
 	if(sysSize == 0) REQUIRE(mbSpace.dim() == 0);
@@ -15,12 +15,12 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 
 	std::random_device                    seed_gen;
 	std::default_random_engine            engine(seed_gen());
-	std::uniform_int_distribution<size_t> dist(0, mbSpace.dim() - 1);
-	constexpr size_t                      nSample = 100;
-	Eigen::ArrayX<size_t>                 index;
+	std::uniform_int_distribution<Size> dist(0, mbSpace.dim() - 1);
+	constexpr Size                      nSample = 100;
+	Eigen::ArrayX<Size>                 index;
 	if(nSample > mbSpace.dim()) {
 		index.resize(mbSpace.dim());
-		for(size_t j = 0; j != mbSpace.dim(); ++j) index(j) = j;
+		for(Size j = 0; j != mbSpace.dim(); ++j) index(j) = j;
 	}
 	else {
 		index = index.NullaryExpr(nSample, [&]() { return dist(engine); });
@@ -31,10 +31,10 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 	// test config_to_ordinal
 #pragma omp parallel for
 	for(auto sample = 0; sample < index.size(); ++sample) {
-		size_t stateNum = index(sample);
+		Size stateNum = index(sample);
 		auto   config   = mbSpace.ordinal_to_config(stateNum);
 		REQUIRE(stateNum == mbSpace.config_to_ordinal(config));
-		for(size_t pos = 0; pos != mbSpace.sysSize(); ++pos) {
+		for(Size pos = 0; pos != mbSpace.sysSize(); ++pos) {
 			REQUIRE(config(pos) == mbSpace.locState(stateNum, pos));
 		}
 	}
@@ -43,11 +43,11 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 	mbSpace.compute_transEqClass();
 	// if(mbSpace.dim() > mbSpace.sysSize() && mbSpace.sysSize() > 2)
 	// 	REQUIRE(mbSpace.transEqDim() < mbSpace.dim());
-	// REQUIRE(static_cast<size_t>(mbSpace.transPeriod().sum()) == mbSpace.dim());
+	// REQUIRE(static_cast<Size>(mbSpace.transPeriod().sum()) == mbSpace.dim());
 
 	Eigen::ArrayXi appeared = Eigen::ArrayXi::Zero(mbSpace.dim());
 #pragma omp parallel for
-	for(size_t eqClassNum = 0; eqClassNum != mbSpace.transEqDim(); ++eqClassNum) {
+	for(Size eqClassNum = 0; eqClassNum != mbSpace.transEqDim(); ++eqClassNum) {
 		auto stateNum = mbSpace.transEqClassRep(eqClassNum);
 		appeared(stateNum) += 1;
 		for(auto trans = 1; trans != mbSpace.transPeriod(eqClassNum); ++trans) {
@@ -56,14 +56,14 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 		}
 	}
 #pragma omp parallel for
-	for(size_t stateNum = 0; stateNum != mbSpace.dim(); ++stateNum)
+	for(Size stateNum = 0; stateNum != mbSpace.dim(); ++stateNum)
 		REQUIRE(appeared(stateNum) == 1);
 
 // 		// test for state_to_transEqClass
 // 		// test for state_to_transShift
 // #pragma omp parallel for
 // 	for(auto sample = 0; sample < index.size(); ++sample) {
-// 		size_t     stateNum   = index(sample);
+// 		Size     stateNum   = index(sample);
 // 		auto const eqClass    = mbSpace.state_to_transEqClass(stateNum);
 // 		auto const eqClassRep = mbSpace.transEqClassRep(eqClass);
 // 		auto const trans      = mbSpace.state_to_transShift(stateNum);
@@ -73,7 +73,7 @@ void test_ManyBodySpaceBase(ManyBodySpaceBase<Derived> const& mbSpace, size_t sy
 	// test for reverse()
 #pragma omp parallel for
 	for(auto sample = 0; sample < index.size(); ++sample) {
-		size_t stateNum = index(sample);
+		Size stateNum = index(sample);
 		auto   config   = mbSpace.ordinal_to_config(stateNum);
 		auto   reversed = mbSpace.config_to_ordinal(config.reverse());
 		REQUIRE(reversed == mbSpace.reverse(stateNum));
