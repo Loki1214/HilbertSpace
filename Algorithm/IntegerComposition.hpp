@@ -60,7 +60,7 @@ class IntegerComposition {
 		template<class Array>
 		__host__ __device__ Size translate(Size const ordinal, int trans, Array& work) const {
 			assert(ordinal < this->dim());
-			assert(0 <= trans && static_cast<Size>(trans) < this->length());
+			assert(0 <= trans && trans < this->length());
 			assert(static_cast<Size>(work.size()) >= this->length() + trans);
 			work.tail(this->length()) = this->ordinal_to_config(ordinal);
 			work.head(trans)          = work.tail(trans);
@@ -151,7 +151,7 @@ __host__ __device__ inline void IntegerComposition::ordinal_to_config(Array&    
 }
 
 __host__ __device__ inline Size IntegerComposition::locNumber(Size ordinal, int const pos) const {
-	assert(0 <= pos && static_cast<Size>(pos) < this->length());
+	assert(0 <= pos && pos < this->length());
 	Size z = 0, zPrev = 0;
 	for(Size l = 1; l != m_Length - pos; ++l) {
 		while(m_workA(z, l) <= ordinal) z += 1;

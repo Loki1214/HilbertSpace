@@ -51,7 +51,7 @@ class ManyBodySpinSpace : public ManyBodySpaceBase<ManyBodySpinSpace> {
 		friend ManyBodySpaceBase<ManyBodySpinSpace>;
 		__host__ __device__ Size locState_impl(Size stateNum, int pos) const {
 			assert(stateNum < this->dim());
-			assert(static_cast<Size>(pos) < this->sysSize());
+			assert(pos < this->sysSize());
 			for(auto l = 0; l != pos; ++l) stateNum /= this->dimLoc();
 			return stateNum % this->dimLoc();
 		}
@@ -79,7 +79,7 @@ class ManyBodySpinSpace : public ManyBodySpaceBase<ManyBodySpinSpace> {
 		template<typename... Args>
 		__host__ __device__ Size translate_impl(Size stateNum, int trans, Args...) const {
 			assert(stateNum < this->dim());
-			assert(0 <= trans && static_cast<Size>(trans) < this->sysSize());
+			assert(0 <= trans && trans < this->sysSize());
 			Size base = 1;
 			for(auto l = 0; l != trans; ++l) base *= this->dimLoc();
 			Size const baseCompl = this->dim() / base;

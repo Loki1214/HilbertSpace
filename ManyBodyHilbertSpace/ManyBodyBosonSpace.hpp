@@ -72,7 +72,7 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		friend ManyBodySpaceBase<ManyBodyBosonSpace>;
 		__host__ __device__ Size locState_impl(Size stateNum, int pos) const {
 			assert(stateNum < this->dim());
-			assert(0 <= pos && static_cast<Size>(pos) < this->sysSize());
+			assert(0 <= pos && pos < this->sysSize());
 			return m_iComp.locNumber(stateNum, pos);
 		}
 
@@ -92,7 +92,7 @@ class ManyBodyBosonSpace : public ManyBodySpaceBase<ManyBodyBosonSpace> {
 		__host__ __device__ Size translate_impl(Size stateNum, int trans,
 		                                          Args&&... args) const {
 			assert(stateNum < this->dim());
-			assert(0 <= trans && static_cast<Size>(trans) < this->sysSize());
+			assert(0 <= trans && trans < this->sysSize());
 			return m_iComp.translate(stateNum, trans, std::forward<Args>(args)...);
 		}
 

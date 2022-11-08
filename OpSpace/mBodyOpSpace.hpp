@@ -99,7 +99,7 @@ class mBodyOpSpace<ManyBodySpinSpace, Scalar_>
 		friend ManyBodySpaceBase< mBodyOpSpace >;
 		__host__ __device__ Size locState_impl(Size opNum, int pos) const {
 			assert(opNum < this->dim());
-			assert(0 <= pos && static_cast<Size>(pos) < this->sysSize());
+			assert(0 <= pos && pos < this->sysSize());
 			auto const posConfNum = opNum / m_opConfig.max();
 			if(this->m_actingSites.locNumber(posConfNum, pos) == 0)
 				return 0;
@@ -142,7 +142,7 @@ class mBodyOpSpace<ManyBodySpinSpace, Scalar_>
 		template<class Array>
 		__host__ __device__ Size translate_impl(Size opNum, int trans, Array& work) const {
 			assert(opNum < this->dim());
-			assert(0 <= trans && static_cast<Size>(trans) < this->sysSize());
+			assert(0 <= trans && trans < this->sysSize());
 			assert(static_cast<Size>(work.size()) >= this->sysSize() + trans);
 			work.tail(this->sysSize()) = this->ordinal_to_config(opNum);
 			work.head(trans)           = work.tail(trans);
@@ -150,7 +150,7 @@ class mBodyOpSpace<ManyBodySpinSpace, Scalar_>
 		}
 		__host__ __device__ Size translate_impl(Size opNum, int trans) const {
 			assert(opNum < this->dim());
-			assert(0 <= trans && static_cast<Size>(trans) < this->sysSize());
+			assert(0 <= trans && trans < this->sysSize());
 			Eigen::ArrayX<Size> work(this->sysSize() + trans);
 			return this->translate(opNum, trans, work);
 		}
