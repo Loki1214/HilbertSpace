@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../typedefs.hpp"
-#include "../ManyBodySpaceBase.hpp"
-#include "../SubSpace.hpp"
+#include "typedefs.hpp"
+#include "ManyBodySpaceBase.hpp"
+#include "SubSpace.hpp"
 
 template<class TotalSpace_, typename Scalar,
          typename std::enable_if_t<

@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
-#include "../ManyBodySpaceBase_test.hpp"
-#include "../OpSpaceBase_test.hpp"
-#include "mBodyOpSpace.hpp"
-#include "../ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
+#include "ManyBodySpaceBase_test.hpp"
+#include "OpSpaceBase_test.hpp"
+#include "OpSpace/mBodyOpSpace.hpp"
+#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
 #include <iostream>
 #include <complex>
 

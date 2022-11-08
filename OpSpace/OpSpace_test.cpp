@@ -3,8 +3,8 @@
 	Eigen::IOFormat(Eigen::StreamPrecision, 0, ", ", ";\n", " ", "", "[", ";\n]")
 
 #include <catch2/catch_test_macros.hpp>
-#include "../OpSpaceBase_test.hpp"
-#include "OpSpace.hpp"
+#include "OpSpaceBase_test.hpp"
+#include "OpSpace/OpSpace.hpp"
 #include <complex>
 #include <iostream>
 

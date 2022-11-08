@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../typedefs.hpp"
-#include "../OpSpaceBase.hpp"
-#include "../HilbertSpace.hpp"
+#include "typedefs.hpp"
+#include "OpSpaceBase.hpp"
+#include "HilbertSpace.hpp"
 #include <Eigen/Core>
 
 template<typename Scalar_>

@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
-#include "../SubSpace_test.hpp"
-#include "TransSector.hpp"
-#include "ManyBodySpinSpace.hpp"
-#include "ManyBodyBosonSpace.hpp"
+#include "SubSpace_test.hpp"
+#include "ManyBodyHilbertSpace/TransSector.hpp"
+#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
+#include "ManyBodyHilbertSpace/ManyBodyBosonSpace.hpp"
 #include <complex>
 #include <iostream>
 

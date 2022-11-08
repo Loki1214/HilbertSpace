@@ -53,6 +53,7 @@ else()
 endif()
 
 
+include_directories("${CMAKE_SOURCE_DIR}")
 set(modules
 	HilbertSpace
 	RandomMatrixEnsemble

@@ -14,7 +14,7 @@
 		}                                                                      \
 	};
 
-__global__ void test_HilbertSpace_kernel(size_t dim) {
+__global__ void test_HilbertSpace_kernel(Size dim) {
 	{
 		// Default constructor
 		{
@@ -65,10 +65,10 @@ TEST_CASE("HilbertSpace_onGPU", "test") {
 	std::default_random_engine      engine(seed_gen());
 	std::uniform_int_distribution<> dist(0, 100000);
 
-	size_t testLoop = 100;
+	Size testLoop = 100;
 
-	for(size_t n = 0; n != testLoop; ++n) {
-		size_t dim = dist(engine);
+	for(Size n = 0; n != testLoop; ++n) {
+		Size dim = dist(engine);
 		test_HilbertSpace_kernel<<<1, 1>>>(dim);
 		cuCHECK(cudaGetLastError());
 		cuCHECK(cudaDeviceSynchronize());

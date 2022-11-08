@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../typedefs.hpp"
-#include "../ManyBodyOpSpaceBase.hpp"
-#include "../ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
-#include "OpSpace.hpp"
-#include "../Algorithm/BaseConverter.hpp"
-#include "../Algorithm/IntegerComposition.hpp"
+#include "typedefs.hpp"
+#include "ManyBodyOpSpaceBase.hpp"
+#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
+#include "OpSpace/OpSpace.hpp"
+#include "Algorithm/BaseConverter.hpp"
+#include "Algorithm/IntegerComposition.hpp"
 #include <Eigen/Dense>
 
 template<class BaseSpace_, typename Scalar_>

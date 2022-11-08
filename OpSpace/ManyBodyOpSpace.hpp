@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../typedefs.hpp"
-#include "../ManyBodyOpSpaceBase.hpp"
-#include "OpSpace.hpp"
+#include "typedefs.hpp"
+#include "ManyBodyOpSpaceBase.hpp"
+#include "OpSpace/OpSpace.hpp"
 #include <Eigen/Dense>
 
 template<class BaseSpace_, typename Scalar_>

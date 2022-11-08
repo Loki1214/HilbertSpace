@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../typedefs.hpp"
+#include "typedefs.hpp"
 #include <Eigen/Dense>
 #include <limits>
 

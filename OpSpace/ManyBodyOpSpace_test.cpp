@@ -1,10 +1,10 @@
 #include <iostream>
 
 #include <catch2/catch_test_macros.hpp>
-#include "../ManyBodySpaceBase_test.hpp"
-#include "../OpSpaceBase_test.hpp"
-#include "ManyBodyOpSpace.hpp"
-#include "../ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
+#include "ManyBodySpaceBase_test.hpp"
+#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
+#include "OpSpaceBase_test.hpp"
+#include "OpSpace/ManyBodyOpSpace.hpp"
 #include <iostream>
 #include <complex>
 

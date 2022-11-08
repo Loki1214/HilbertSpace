@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../typedefs.hpp"
-#include "../ManyBodySpaceBase.hpp"
+#include "typedefs.hpp"
+#include "ManyBodySpaceBase.hpp"
 
 class ManyBodySpinSpace;
 template<>

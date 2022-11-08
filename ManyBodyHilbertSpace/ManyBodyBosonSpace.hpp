@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../typedefs.hpp"
-#include "../ManyBodySpaceBase.hpp"
-#include "../Algorithm/IntegerComposition.hpp"
+#include "typedefs.hpp"
+#include "ManyBodySpaceBase.hpp"
+#include "Algorithm/IntegerComposition.hpp"
 
 class ManyBodyBosonSpace;
 template<>

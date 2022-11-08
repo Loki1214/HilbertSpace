@@ -1,6 +1,6 @@
 // #include <catch2/catch_test_macros.hpp>
-#include "../ManyBodySpaceBase_test.cuh"
-#include "ManyBodySpinSpace.hpp"
+#include "ManyBodySpaceBase_test.cuh"
+#include "ManyBodyHilbertSpace/ManyBodySpinSpace.hpp"
 #include <iostream>
 
 #ifndef cuCHECK

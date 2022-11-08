@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
-#include "../ManyBodySpaceBase_test.hpp"
-#include "ManyBodyBosonSpace.hpp"
+#include "ManyBodySpaceBase_test.hpp"
+#include "ManyBodyHilbertSpace/ManyBodyBosonSpace.hpp"
 #include <iostream>
 
 TEST_CASE("ManyBodyBosonSpace", "test") {
